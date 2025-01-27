@@ -4,6 +4,8 @@
 #          - Angela Garcia #22869
 
 import os
+from typing import List, Tuple
+
 """
 especificaciones:
 - El programa debe simular un búfer con un tamaño fijo de 10 caracteres.
@@ -14,48 +16,59 @@ especificaciones:
 
 """
 ruta_actual = os.getcwd()
-#leer el archivo
-def leer_archivo(archivo):
-    return open("../M2-ddl/"+archivo, "r").read()
+
+
+# leer el archivo
+def leer_archivo(archivo: str) -> str:
+    return open("../M2-ddl/" + archivo, "r").read()
+
 
 # Código base para iniciar
-def cargar_buffer(entrada, inicio, tamano_buffer):
-  buffer = entrada[inicio:inicio + tamano_buffer]
-  return buffer
+def cargar_buffer(entrada: List[str], inicio: int, tamano_buffer: int) -> List[str]:
+    buffer = entrada[inicio : inicio + tamano_buffer]
+    return buffer
 
-def procesar_buffer(buffer, lexema_incompleto=""):
+
+def procesar_buffer(
+    buffer: List[str], lexema_incompleto: str = ""
+) -> Tuple[List[str], str]:
     print("-------    buffer: " + str(buffer))
 
     avance = 0  # posición del puntero de avance
 
     # Procesar y extraer lexemas del buffer
     lexemas = []
-    lexema_actual= lexema_incompleto #esto va a hacer que no se corte al final de cada buffer
+    lexema_actual = (
+        lexema_incompleto  # esto va a hacer que no se corte al final de cada buffer
+    )
 
     while avance < len(buffer):
-        caracter = buffer[avance] 
+        caracter = buffer[avance]
         # print("caracter: " +caracter)
-        avance+= 1
+        avance += 1
 
-        #ignorar espacios y si es eof 
-        if caracter!= " " and caracter!="eof":
-            #agregar caracter al lexema actual
+        # ignorar espacios y si es eof
+        if caracter != " " and caracter != "eof":
+            # agregar caracter al lexema actual
             lexema_actual += caracter
         else:
-            #si el lexema actual no está vacío, agregarlo a la lista de lexemas y reiniciar el lexema actual
-            if lexema_actual!= "":
+            # si el lexema actual no está vacío, agregarlo a la lista de lexemas y reiniciar el lexema actual
+            if lexema_actual != "":
                 print("lexema procesado: " + lexema_actual)
                 lexemas.append(lexema_actual)
                 lexema_actual = ""
-            #si el lexema es eof, salir del ciclo
+            # si el lexema es eof, salir del ciclo
             if caracter == "eof":
                 # print("lexema procesado: eof")
                 lexemas.append("eof")
                 break
 
-    if lexema_actual!="":
+    if lexema_actual != "":
         lexemas.append(lexema_actual)
-    return lexemas, lexema_actual #devolver los lexemas y el incompleto   # retornar la lista de lexemas procesados del buffer
+    return (
+        lexemas,
+        lexema_actual,
+    )  # devolver los lexemas y el incompleto   # retornar la lista de lexemas procesados del buffer
 
 
 # entrada = list("Esto es un ejemplo con entrada eof")
@@ -63,18 +76,17 @@ entrada = list(leer_archivo("archivo.txt"))
 # entrada.append("eof")
 # # entrada = leer_archivo("archivo.txt")
 
-#puntero de inicio
+# puntero de inicio
 inicio = 0
 tamano_buffer = 10
-lexema_incompleto=""
+lexema_incompleto = ""
 
 while inicio < len(entrada):
     buffer = cargar_buffer(entrada, inicio, tamano_buffer)
     lexemas, lexema_incompleto = procesar_buffer(buffer, lexema_incompleto)
     # print("Lexemas:", lexemas)
     # inicio += len(buffer)
-    # cerrar el while cuando sea eof 
+    # cerrar el while cuando sea eof
     if "eof" in buffer:
-        break   
+        break
     inicio += tamano_buffer  # avanzar el inicio del buffer para la próxima lectura
-
