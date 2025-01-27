@@ -3,7 +3,7 @@
 #          - Francis Aguilar #22243
 #          - Angela Garcia #22869
 
-
+import os
 """
 especificaciones:
 - El programa debe simular un búfer con un tamaño fijo de 10 caracteres.
@@ -13,11 +13,10 @@ especificaciones:
 - El programa debe imprimir cada lexema (caracteres entre dos espacios o el final) procesado del búfer.
 
 """
-
+ruta_actual = os.getcwd()
 #leer el archivo
 def leer_archivo(archivo):
-    pass
-
+    return open("../M2-ddl/"+archivo, "r").read()
 
 # Código base para iniciar
 def cargar_buffer(entrada, inicio, tamano_buffer):
@@ -59,10 +58,10 @@ def procesar_buffer(buffer, lexema_incompleto=""):
     return lexemas, lexema_actual #devolver los lexemas y el incompleto   # retornar la lista de lexemas procesados del buffer
 
 
-entrada = list("Esto es un ejemplo con entrada eof")
-# entrada = list(leer_archivo("archivo.txt"))
-entrada.append("eof")
-# entrada = leer_archivo("archivo.txt")
+# entrada = list("Esto es un ejemplo con entrada eof")
+entrada = list(leer_archivo("archivo.txt"))
+# entrada.append("eof")
+# # entrada = leer_archivo("archivo.txt")
 
 #puntero de inicio
 inicio = 0
@@ -74,7 +73,7 @@ while inicio < len(entrada):
     lexemas, lexema_incompleto = procesar_buffer(buffer, lexema_incompleto)
     # print("Lexemas:", lexemas)
     # inicio += len(buffer)
-    #cerrar el while cuando sea eof 
+    # cerrar el while cuando sea eof 
     if "eof" in buffer:
         break   
     inicio += tamano_buffer  # avanzar el inicio del buffer para la próxima lectura
