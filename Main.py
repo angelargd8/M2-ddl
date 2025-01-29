@@ -30,9 +30,12 @@ def cargar_buffer(entrada: List[str], inicio: int, tamano_buffer: int) -> List[s
 
 
 def procesar_buffer(
-    buffer: List[str], lexema_incompleto: str = ""
+    bufferCount: int,
+    buffer: List[str],
+    lexema_incompleto: str = "",
+    tamaño_buffer: int = 10,
+    entradaLength: int = 10,
 ) -> Tuple[List[str], str]:
-    # print("-------    buffer: " + str(buffer))
 
     avance = 0  # posición del puntero de avance
 
@@ -41,27 +44,37 @@ def procesar_buffer(
     lexema_actual = (
         lexema_incompleto  # esto va a hacer que no se corte al final de cada buffer
     )
+    bufferCount + 1
 
     while avance < len(buffer):
         caracter = buffer[avance]
-        # print("caracter: " +caracter)
         avance += 1
 
         # ignorar espacios
         if caracter != " ":
-            # agregar caracter al lexema actual
-            lexema_actual += caracter
+
+            # Si encuentra un salto de linea tratarlo como un eol
+            if caracter == "\n":
+                lexema_actual += ""
+                print(f"New Line")
+            else:
+                # agregar caracter al lexema actual
+                lexema_actual += caracter
+            # Si llega al final del archivo, guardar el ultimo lexema
+            if avance + tamaño_buffer * bufferCount == entradaLength:
+                print("lexema procesado: " + lexema_actual)
+                lexemas.append(lexema_actual)
 
         # Al encontrar un espacio, mostrar el lexema guardado
         else:
             # Agregar a la lista de lexemas y reiniciar el lexema actual
             print("lexema procesado: " + lexema_actual)
+
             if lexema_actual == "eof":
                 # si el lexema es eof, salir del ciclo
                 return ([], "EOF")
             if lexema_actual == "eol":
-                line = +1
-                print(f"New Line {line}")
+                print(f"New Line")
             lexemas.append(lexema_actual)
             lexema_actual = ""
 
@@ -73,19 +86,24 @@ def procesar_buffer(
     )  # devolver los lexemas y el incompleto   # retornar la lista de lexemas procesados del buffer
 
 
-# entrada = list("Esto es un ejemplo con entrada eof")
 entrada = list(leer_archivo("archivo.txt"))
-# entrada.append("eof")
-# # entrada = leer_archivo("archivo.txt")
 
 # puntero de inicio
 inicio = 0
 tamano_buffer = 10
 lexema_incompleto = ""
+bufferCount = 0
 
-while inicio <= len(entrada):
+while inicio <= len(entrada) + 1:
     buffer = cargar_buffer(entrada, inicio, tamano_buffer)
-    lexemas, lexema_incompleto = procesar_buffer(buffer, lexema_incompleto)
+    lexemas, lexema_incompleto = procesar_buffer(
+        bufferCount,
+        buffer,
+        lexema_incompleto,
+        tamano_buffer,
+        len(entrada),
+    )
+    bufferCount += 1
 
     if inicio >= len(entrada):
         print("--------------- You have reaced the end of file ---------------")
@@ -94,4 +112,4 @@ while inicio <= len(entrada):
     if lexemas == [] and lexema_incompleto == "EOF":
         print("--------------- You have reaced the end of file ---------------")
         break
-    inicio += tamano_buffer  # avanzar el inicio del buffer para la próxima lectura
+    inicio += tamano_buffer  # avanzar el inicio del buffer para la próxima lectura
