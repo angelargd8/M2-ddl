@@ -19,8 +19,8 @@ ruta_actual = os.getcwd()
 
 
 # leer el archivo
-def leer_archivo(archivo: str) -> str:
-    return open("../M2-ddl/" + archivo, "r").read()
+def leer_archivo(archivo) -> str:
+    return open(archivo, "r").read()
 
 
 # Código base para iniciar
@@ -56,14 +56,14 @@ def procesar_buffer(
             # Si encuentra un salto de linea tratarlo como un eol
             if caracter == "\n":
                 print(f"New Line")
-                break
+                lexemas.append(lexema_actual)
             else:
                 # agregar caracter al lexema actual
                 lexema_actual += caracter
             # Si llega al final del archivo, guardar el ultimo lexema
             if avance + tamaño_buffer * bufferCount == entradaLength:
                 print("lexema procesado: " + lexema_actual)
-                lexemas.append(lexema_actual)
+                lexemas.append(lexema_actual)    
 
         # Al encontrar un espacio, mostrar el lexema guardado
         else:
