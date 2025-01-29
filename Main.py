@@ -55,8 +55,8 @@ def procesar_buffer(
 
             # Si encuentra un salto de linea tratarlo como un eol
             if caracter == "\n":
-                lexema_actual += ""
                 print(f"New Line")
+                break
             else:
                 # agregar caracter al lexema actual
                 lexema_actual += caracter
