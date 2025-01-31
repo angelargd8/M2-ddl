@@ -1,0 +1,101 @@
+table
+{
+	/* width:100%; */
+}
+ td
+ {
+	 padding-left:10px;
+	 padding-bottom:10px;
+ }
+ thead td
+ {
+	 font-weight: bold;
+ }
+ .spacer
+ {
+	 display:block;
+	 margin-top:30px;
+ }
+ .was-option-group
+ {
+	 border-bottom: 1px solid #dfdfdf;
+	 border-top: 1px solid #fff;
+ }
+ .was-option-group-top
+ {
+	 border-bottom: 1px solid #dfdfdf;
+	 border-top: 1px solid #dfdfdf;
+ }
+ .was-form-field label, .was-option-group-top label{
+	float: left;
+	padding: 0;
+	width: 250px;
+	margin-right:20px;
+	/* font-weight:bold; */
+	font-size:12px;
+ }
+
+/* .was-form-field input.short[type="text"],  .was-form-field input.short[type="textarea"], select.was_select_box{
+	 width: 25%;
+	 float: left;
+ } */
+ .was-form-field.checkbox-par:nth-child(2)
+ {
+	/* height:30px; */
+	margin-top:50px;
+ }
+ .wcas_timer_date_label
+ {
+	
+ }
+ .wcas_timer_date_value
+ {
+	
+ }
+div.wcas-countdown {
+    padding-top: 5px;
+    padding-bottom: 15px;
+	display:block;
+}
+#wcas-message
+{
+	margin-top:20px;
+	margin-bottom:10px;
+	display:block;
+	clear: both;
+}
+#wcas-message-shop
+{
+	margin-top:25px;
+	margin-bottom:10px;
+	display:block;
+	clear: both;
+}
+.message_box_hidable
+{
+	/* opacity:0; */
+	display:none
+}
+
+.wcas-progress-bar-box
+{
+	position:relative;
+	display:block;
+	clear:both;
+	width:100%;
+	margin-bottom: 10px;
+}
+.wcas-progress-bar-background, .wcas-progress-bar
+{
+	top:0px;
+	width:100%;
+	height: 6px;
+}
+.wcas-progress-label
+{
+	text-align:center;
+}
+.woocommerce div.product form.cart::after {
+	overflow: hidden;
+	margin-bottom: 20px;
+}

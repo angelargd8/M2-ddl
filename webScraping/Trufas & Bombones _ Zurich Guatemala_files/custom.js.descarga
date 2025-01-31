@@ -1,0 +1,53 @@
+jQuery.noConflict();
+(function( $ ) {
+	$(function() {
+		// HEADER
+		function fixDivBarra() {
+			var $cache = $('header.et-l--header'); 
+			if ($(window).scrollTop() > 100){
+				$cache.addClass('headeron');
+			} else {
+				$cache.removeClass('headeron');
+				$cache.addClass('headeroff');
+			}
+		}
+		jQuery(window).scroll(fixDivBarra); 
+		fixDivBarra(); 
+		// CHANGE CLASS
+		$("#billing_wooccm15_field").change(function(){
+		    
+		if($(this).val() == "test1") {
+			$('.select-zone').addClass('validate-required');
+			} else {
+				$('.select-zone').removeClass('validate-required');
+			}
+		});
+		// DISABLED OPTION SELECT ZONE CHECK WOOCOMMERCE
+		$(document).ready(function(){
+			$('#billing_wooccm15 > option[value="Zona 6"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Zona 18"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Zona 19"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Zona 21"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Zona 24"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Zona 25"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Villa Nueva"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Amatitlán"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Villa Canales"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Boca del Monte"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="San José Pinula"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Fraijanes"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Palencia"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="San Miguel Petapa"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="San Miguel Petapa"]').attr('disabled', 'disabled');
+			$('#billing_wooccm15 > option[value="Zona 10 Mixco"]').attr('disabled', 'disabled');
+		});      
+	});
+	
+	const checkout_form = $('form.checkout');
+
+checkout_form.on('checkout_place_order', e => {
+    e.preventDefault()
+    console.log('checkout_place_order')
+    return null;
+});
+})(jQuery);

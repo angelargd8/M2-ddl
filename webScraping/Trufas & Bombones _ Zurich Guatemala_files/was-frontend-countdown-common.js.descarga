@@ -1,0 +1,35 @@
+jQuery(document).ready(function()
+{
+	"use strict";
+	jQuery('.wcas-expiratin-date-controller').each(function(index, elem)
+	{
+		var current_id = jQuery(elem).data('id');
+		var wcas_sec_string = wcas_expiration[current_id].sec_string;
+		var wcas_min_string = wcas_expiration[current_id].min_string;
+		var wcas_hour_string = wcas_expiration[current_id].hour_string;
+		var wcas_days_string = wcas_expiration[current_id].days_string;
+		var wcas_weeks_string = wcas_expiration[current_id].weeks_string;
+		var serverTime = new Date(wcas_expiration[current_id].serverTime);
+		var endtime =  new Date(wcas_expiration[current_id].endtime);
+		var difference = parseInt(wcas_expiration[current_id].difference);
+	
+		
+		if(difference >0)
+		{
+		 var display = document.querySelector('#expiratin-date-clock'+current_id);
+		 //wcas_startTimer(difference, display, function(){setTimeout(function(){jQuery(this).parent().addClass('disabled'); location.reload();}, 5000);});
+		 
+		  //new
+		  var end_date = new Date();
+		 end_date.setSeconds(end_date.getSeconds() + difference);
+		 jQuery('#expiratin-date-clock'+current_id).countdown(wcsa_data_formatter(end_date), function(event) {
+			  var $this = jQuery(this).html(event.strftime(''
+				+ (event.offset.weeks > 0 ? '<span class="wcas_timer_date_value wcsa_weeks_value">%w</span> <span class="wcas_timer_date_label wcsa_weeks_label">'+wcas_weeks_string+'</span> ' : '')
+				+ (event.offset.days > 0 ? '<span class="wcas_timer_date_value wcsa_days_value">%d</span> <span class="wcas_timer_date_label wcsa_days_label">'+wcas_days_string+'</span> ': '')
+				+ (event.offset.hours > 0 ?'<span class="wcas_timer_date_value wcsa_hour_value">%H</span> <span class="wcas_timer_date_label wcsa_hour_label">'+wcas_hour_string+'</span> ': '')
+				+ (event.offset.minutes > 0 ?'<span class="wcas_timer_date_value wcsa_minute_value">%M</span> <span class="wcas_timer_date_label wcsa_minute_label">'+wcas_min_string+'</span> ': '')
+				+ '<span class="wcas_timer_date_value wcsa_second_value">%S</span> <span class="wcas_timer_date_label wcsa_second_label">'+wcas_sec_string+'</span>'));
+			}).on('finish.countdown',function(event){setTimeout(function(){jQuery(this).parent().addClass('disabled'); location.reload();}, 5000);});
+		}
+	});
+});
