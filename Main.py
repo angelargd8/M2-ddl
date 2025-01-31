@@ -55,15 +55,19 @@ def procesar_buffer(
 
             # Si encuentra un salto de linea tratarlo como un eol
             if caracter == "\n":
+                print("lexema procesado: ", lexema_actual)
+                lexemas.append(lexema_actual)
+                lexema_actual = " "
                 print(f"New Line")
-                break
             else:
                 # agregar caracter al lexema actual
                 lexema_actual += caracter
             # Si llega al final del archivo, guardar el ultimo lexema
+
             if avance + tamaño_buffer * bufferCount == entradaLength:
                 print("lexema procesado: " + lexema_actual)
                 lexemas.append(lexema_actual)
+                return (lexemas, "EOF")
 
         # Al encontrar un espacio, mostrar el lexema guardado
         else:
@@ -78,8 +82,6 @@ def procesar_buffer(
             lexemas.append(lexema_actual)
             lexema_actual = ""
 
-    if lexema_actual != "":
-        lexemas.append(lexema_actual)
     return (
         lexemas,
         lexema_actual,
@@ -93,6 +95,7 @@ inicio = 0
 tamano_buffer = 10
 lexema_incompleto = ""
 bufferCount = 0
+totalLexemas = []
 
 while inicio <= len(entrada) + 1:
     buffer = cargar_buffer(entrada, inicio, tamano_buffer)
@@ -105,11 +108,16 @@ while inicio <= len(entrada) + 1:
     )
     bufferCount += 1
 
+    for i in range(len(lexemas)):
+        totalLexemas.append(lexemas[i])
+
     if inicio >= len(entrada):
         print("--------------- You have reaced the end of file ---------------")
         break
 
-    if lexemas == [] and lexema_incompleto == "EOF":
+    if lexema_incompleto == "EOF":
         print("--------------- You have reaced the end of file ---------------")
+        print("lexemas totales ", totalLexemas)
+
         break
     inicio += tamano_buffer  # avanzar el inicio del buffer para la próxima lectura
