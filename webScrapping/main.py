@@ -6,18 +6,18 @@
 import re
 import csv
 from urllib.parse import urljoin
+import buffer 
 
 
 #abrir un archivo html de la pagina descargada
 def cargar_html(nombre_archivo):
-    with open(nombre_archivo, 'r', encoding='utf-8') as file:
-        return file.read()
-
-#implementar un buffer para procesar el contenido
+    b = buffer.buffer_main("Trufas & Bombones _ Zurich Guatemala.html")
+    return " ".join(b)
 
 #usar expresiones regulares para encontrar los nombres de productos y urls de imagenes
 def extraer_productos(archivo_html, url_base):
     productos = []
+    print(archivo_html)
     #re.dotall sirve para que el . en la re coincida con cualquier caracter y el finter sirve para devolver un iterador de las conincidencias
     for match in re.finditer(r'<li class="product.*?<a.*?<img.*?src="(.*?)"(?: alt=".*?")?.*?>.*?<h2 class="woocommerce-loop-product__title"\s*>(.*?)</h2>', archivo_html, re.DOTALL):
         imagen = match.group(1)
@@ -42,7 +42,6 @@ def exportar_csv(productos, archivo_salida):
         writer.writerow(['Nombre del producto', 'Url de la imagen'])
         for producto in productos:
             writer.writerow(producto)
-
 
 
 #cargar el archivo

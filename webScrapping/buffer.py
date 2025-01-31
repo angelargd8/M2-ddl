@@ -20,7 +20,8 @@ ruta_actual = os.getcwd()
 
 # leer el archivo
 def leer_archivo(archivo: str) -> str:
-    return open("../M2-ddl/" + archivo, "r").read()
+    with open(archivo, 'r', encoding='utf-8') as file:
+        return file.read()
 
 
 # Código base para iniciar
@@ -55,24 +56,24 @@ def procesar_buffer(
 
             # Si encuentra un salto de linea tratarlo como un eol
             if caracter == "\n":
-                print("lexema procesado: ", lexema_actual)
+                # print("lexema procesado: ", lexema_actual)
                 lexemas.append(lexema_actual)
                 lexema_actual = " "
-                print(f"New Line")
+                # print(f"New Line")
             else:
                 # agregar caracter al lexema actual
                 lexema_actual += caracter
             # Si llega al final del archivo, guardar el ultimo lexema
 
             if avance + tamaño_buffer * bufferCount == entradaLength:
-                print("lexema procesado: " + lexema_actual)
+                # print("lexema procesado: " + lexema_actual)
                 lexemas.append(lexema_actual)
-                return (lexemas, "EOF")
+                # return (lexemas, "EOF")
 
         # Al encontrar un espacio, mostrar el lexema guardado
         else:
             # Agregar a la lista de lexemas y reiniciar el lexema actual
-            print("lexema procesado: " + lexema_actual)
+            # print("lexema procesado: " + lexema_actual)
 
             if lexema_actual == "eof":
                 # si el lexema es eof, salir del ciclo
@@ -88,36 +89,38 @@ def procesar_buffer(
     )  # devolver los lexemas y el incompleto   # retornar la lista de lexemas procesados del buffer
 
 
-entrada = list(leer_archivo("archivo.txt"))
+def buffer_main(archivo):
+    entrada = list(leer_archivo(archivo))
+  
+    # puntero de inicio
+    inicio = 0
+    tamano_buffer = 10
+    lexema_incompleto = ""
+    bufferCount = 0
+    totalLexemas = []
 
-# puntero de inicio
-inicio = 0
-tamano_buffer = 10
-lexema_incompleto = ""
-bufferCount = 0
-totalLexemas = []
+    while inicio <= len(entrada) + 1:
+        buffer = cargar_buffer(entrada, inicio, tamano_buffer)
+        lexemas, lexema_incompleto = procesar_buffer(
+            bufferCount,
+            buffer,
+            lexema_incompleto,
+            tamano_buffer,
+            len(entrada),
+        )
+        bufferCount += 1
 
-while inicio <= len(entrada) + 1:
-    buffer = cargar_buffer(entrada, inicio, tamano_buffer)
-    lexemas, lexema_incompleto = procesar_buffer(
-        bufferCount,
-        buffer,
-        lexema_incompleto,
-        tamano_buffer,
-        len(entrada),
-    )
-    bufferCount += 1
+        for i in range(len(lexemas)):
+            totalLexemas.append(lexemas[i])
 
-    for i in range(len(lexemas)):
-        totalLexemas.append(lexemas[i])
+        if inicio >= len(entrada):
+            print("--------------- You have reaced the end of file ---------------")
+            break
 
-    if inicio >= len(entrada):
-        print("--------------- You have reaced the end of file ---------------")
-        break
+        if lexema_incompleto == "EOF":
+            print("--------------- You have reaced the end of file ---------------")
+            # print("lexemas totales ", totalLexemas)
 
-    if lexema_incompleto == "EOF":
-        print("--------------- You have reaced the end of file ---------------")
-        print("lexemas totales ", totalLexemas)
-
-        break
-    inicio += tamano_buffer  # avanzar el inicio del buffer para la próxima lectura
+            break
+        inicio += tamano_buffer  # avanzar el inicio del buffer para la próxima lectura
+    return totalLexemas
