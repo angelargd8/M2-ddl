@@ -43,6 +43,8 @@ def exportar_csv(productos, archivo_salida):
         for producto in productos:
             writer.writerow(producto)
 
+
+
 #cargar el archivo
 nombre_archivo= 'Trufas & Bombones _ Zurich Guatemala.html'
 archivo_html = cargar_html(nombre_archivo)
