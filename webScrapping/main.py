@@ -12,7 +12,7 @@ import buffer
 #abrir un archivo html de la pagina descargada
 def cargar_html(nombre_archivo):
     b = buffer.buffer_main("Trufas & Bombones _ Zurich Guatemala.html")
-    return " ".join(b)
+
 
 #usar expresiones regulares para encontrar los nombres de productos y urls de imagenes
 def extraer_productos(archivo_html, url_base):
