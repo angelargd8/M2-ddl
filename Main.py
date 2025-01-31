@@ -63,7 +63,7 @@ def procesar_buffer(
             # Si llega al final del archivo, guardar el ultimo lexema
             if avance + tamaño_buffer * bufferCount == entradaLength:
                 print("lexema procesado: " + lexema_actual)
-                lexemas.append(lexema_actual)    
+                lexemas.append(lexema_actual)
 
         # Al encontrar un espacio, mostrar el lexema guardado
         else:
