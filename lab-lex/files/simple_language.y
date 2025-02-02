@@ -38,7 +38,6 @@ statement: assignment
 
 assignment: ID '=' expression
     { 
-        //printf("Assign %s = %d\n", $1->c_str(), $3); 
         printf("Assign %s = %f\n", $1->c_str(), $3);
         $$ = vars[*$1] = $3; 
         delete $1;
