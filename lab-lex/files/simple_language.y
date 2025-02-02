@@ -2,12 +2,16 @@
 #include <iostream>
 #include <string>
 #include <map>
-static std::map<std::string, int> vars;
+#include <cstdlib>
+extern char *yytext;
+extern int yylineno;
+
+static std::map<std::string, double> vars;
 inline void yyerror(const char *str) { std::cout << str << std::endl; }
 int yylex();
 %}
 
-%union { int num; std::string *str; }
+%union { double num; std::string *str; }
 
 %token<num> NUMBER
 %token<str> ID
@@ -17,6 +21,7 @@ int yylex();
 %right '='
 %left '+' '-'
 %left '*' '/'
+%nonassoc UNARY
 
 %%
 
@@ -33,18 +38,22 @@ statement: assignment
 
 assignment: ID '=' expression
     { 
-        printf("Assign %s = %d\n", $1->c_str(), $3); 
+        //printf("Assign %s = %d\n", $1->c_str(), $3); 
+        printf("Assign %s = %f\n", $1->c_str(), $3);
         $$ = vars[*$1] = $3; 
         delete $1;
     }
     ;
 
 expression: NUMBER                  { $$ = $1; }
+    | '-' expression %prec UNARY    { $$ = -$2 ; }
     | ID                            { $$ = vars[*$1];      delete $1; }
     | expression '+' expression     { $$ = $1 + $3; }
     | expression '-' expression     { $$ = $1 - $3; }
     | expression '*' expression     { $$ = $1 * $3; }
     | expression '/' expression     { $$ = $1 / $3; }
+    | '(' expression ')'     { $$ = $2 ; }
+
     ;
 
 %%
@@ -52,4 +61,8 @@ expression: NUMBER                  { $$ = $1; }
 int main() {
     yyparse();
     return 0;
+}
+
+void yyerror(const char *s){
+    std::cerr << "error: " << s << " en el token '" << yytext << "' en linea " << yylineno << std::endl;
 }
