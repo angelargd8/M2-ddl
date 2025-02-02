@@ -8,7 +8,13 @@
 cd lab-lex
 ```
 
-- Ejecutar **uno** de los siguientes comandos:
+- Primero ejecutar este comando para crear la imagen:
+
+```bash
+docker build --rm . -t lab1-image
+```
+
+- Luego ejecutar **uno** de los siguientes comandos para el contenedor:
 
 ```bash
 docker run --rm -ti lab1-image
