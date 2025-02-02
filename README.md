@@ -37,3 +37,26 @@ g++ -c lex.yy.c
 g++ -c y.tab.c
 g++ -o calc y.tab.o lex.yy.o
 ```
+
+```bash
+./calc
+```
+
+
+## 3. **_Expresiones mas complejas_**
+- ingresar una expresion y luego presionar enter
+```bash
+10+5:
+8+6/2:
+(5*5)/(2+3):
+((8+6)/2)+((5-3)*2):
+8*5+(3/(4+9/(1+3/2)))):
+(-3+(2*(4/(1-9)))): 
+
+```
+## 4. **_Asignacion de variables_**
+
+```bash
+
+
+```
