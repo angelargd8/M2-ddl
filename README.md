@@ -18,6 +18,10 @@ docker run --rm -ti lab1-image
 docker run --rm -ti -v "${PWD}:/home" lab1-image
 ```
 
+```bash
+docker run --rm -ti -v "${(path hacia la carpeta)} lab1-image
+```
+
 ## 2. **_Compilar gramatica_**
 
 ```bash
