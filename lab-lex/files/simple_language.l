@@ -20,7 +20,7 @@ void yyerror(const char *s);
 "("                     { return '('; }
 ")"                     { return ')'; }
 [ \t\n]                   ;  // skip whitespace
-.                       {  return yytext[0]; }
+.                       { yyerror("Token invalido"); }
 
 %%
 
