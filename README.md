@@ -18,7 +18,7 @@ docker run --rm -ti lab1-image
 docker run --rm -ti -v "${PWD}:/home" lab1-image
 ```
 
-## 2. Compilar gramatica
+## 2. **_Compilar gramatica_**
 
 ```bash
 flex ./files/simple_language.l
