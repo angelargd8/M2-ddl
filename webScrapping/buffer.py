@@ -20,7 +20,7 @@ ruta_actual = os.getcwd()
 
 # leer el archivo
 def leer_archivo(archivo: str) -> str:
-    with open(archivo, 'r', encoding='utf-8') as file:
+    with open(archivo, "r", encoding="utf-8") as file:
         return file.read()
 
 
@@ -91,7 +91,7 @@ def procesar_buffer(
 
 def buffer_main(archivo):
     entrada = list(leer_archivo(archivo))
-  
+
     # puntero de inicio
     inicio = 0
     tamano_buffer = 10
