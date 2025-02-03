@@ -2,24 +2,22 @@
 #include <cstdlib>
 #include <string>
 #include "y.tab.h"
-
-void yyerror(const char *s);
-
 %}
 
 %%
 
 [a-zA-Z][a-zA-Z0-9]*    { yylval.str = new std::string(yytext);  return ID; }
-//[0-9]+(\.[0-9]*)?([eE][-+]?[0-9]+)? { yylval.num = strtod(yytext, NULL); return NUMBER; }
-[0-9]+(\.[0-9]+)?    { yylval.num = atof(yytext); return NUMBER; }
+[0-9]+                  { yylval.num = strtol(yytext, NULL, 10); return NUMBER; }
 "+"                     { return '+'; }
 "-"                     { return '-'; }
 "*"                     { return '*'; }
 "/"                     { return '/'; }
 "="                     { return '='; }
 ":"                     { return ':'; }
-[ \t\n]                   ;  // skip whitespace
-.                       {  return yytext[0]; }
+"("                     { return '('; }
+")"                     { return ')'; }
+[ \t]                   ;  // ignorar espacios y tabulaciones
+.|\n                    ;  // ignora cualquier otro carácter
 
 %%
 
