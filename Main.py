@@ -25,15 +25,36 @@ Luego permita procesar cadenas, y para cada una indique si es aceptada o no.
 
 import os
 
-from refactor import leerArchivo
+from constructor import leerArchivo, construirArbol,  construirArbolSintactico 
 from regex import  infixToPostfix
+from afn import *
+from AFD import *
+from node import *
+from collections import deque, defaultdict
 
+
+
+def construirAFD(postfix):
+    #construir el arbol sintactico para la cadena
+    ArbolSintactico = construirArbolSintactico(postfix)
+    # print(ArbolSintactico)
+    #el followpos es la tablita para saber las posiciones que se tienen que seguir
+    followpos = defaultdict(set)
+    calcular_followPos(ArbolSintactico, followpos)
+    print(followpos)
+
+    #construir el AFD
+    afd = construir_AFD(ArbolSintactico, followpos)
+    afd.mostrar()
+    return afd
 
 
 expresiones = leerArchivo('./expresiones.txt')
-print(expresiones)
 
+# Procesar cada expresión regular y generar el AFD
 for expresion in expresiones:
     print("Expresion ingresada: \n"+expresion)
     postfix = infixToPostfix(expresion)
     print ("Expresion POSTFIX \n"+ postfix + "\n")
+    construirAFD(postfix)
+    
