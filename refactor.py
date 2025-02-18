@@ -1,59 +1,27 @@
 import os
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 
 # leer el archivo
-def leer_archivo(archivo: str) -> str:
-    return open("../M2-ddl/" + archivo, "r").read()
 
+'''
+Al refactorizar el leer el archivo se uso IA, y se aplico 
+Union[List[str], str] en vez de solo '-> str', como se tenia en el lab de buffer
+ya que la IA, recomendo devolver Union[List[str], str] 
+para indicar que puede devolver una lista de cadenas o un mensaje de error
+'''
 
-# Código base para iniciar
-def cargar_buffer(entrada: List[str], inicio: int, tamano_buffer: int) -> List[str]:
-    buffer = entrada[inicio : inicio + tamano_buffer]
-    return buffer
-
-
-def eol_handler(lexemas: list, lexema_actual: str):
-    print("New Line")
-    return
-
-
-def eof_handler():
-    print("--------------- You have reaced the end of file ---------------")
-    return
-
-
-def add_lexema(lexema_actual: str, lexemas: list[str]):
-    lexemas.append(lexema_actual)
-
-
-def add_caracter(caracter: str, lexema_actual: str, is_final: bool):
-    lexema_actual += caracter
-    if is_final:
-        eof_handler()
-
-
-def buffer_handler(buffer_size: int, file_path: str):
-    buffer_count = 0
-    entrada = leer_archivo(file_path)
-    lexemas = []
-    lexema_incompleto = ""
-    lexema_actual = lexema_incompleto
-
-    for i in range(len(entrada)):
-        buffer_count += 1
-        buffer = cargar_buffer(entrada, i, buffer_size)
-
-        for j in range(len(buffer)):
-            pointer = buffer[j]
-            is_final = j + buffer_size * buffer_count == len(entrada)
-
-            match pointer:
-                case "\n":
-                    eol_handler(lexema_actual=lexema_actual, lexemas=lexemas)
-                case _:
-                    add_caracter(
-                        caracter=pointer, lexema_actual=lexema_actual, is_final=is_final
-                    )
-
-        pass
+def leerArchivo(file: str) ->  Union[List[str], str]:
+    try:
+        script_dir = os.path.dirname(__file__)  # Directorio del script actual
+        file_path = os.path.join(script_dir, file)
+        
+        with open(file_path, 'r', encoding='utf-8') as f:
+            expresiones = f.read().split('\n')
+        
+        print(expresiones, type(expresiones))
+        return expresiones
+    except FileNotFoundError:
+        return "El archivo no fue encontrado"
+    except IOError:
+        return "Error al leer el archivo"

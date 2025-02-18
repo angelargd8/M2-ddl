@@ -1,115 +1,39 @@
-# Buffer simulator 🤑
-# Autores: - Cesar Lopez #22535
-#          - Francis Aguilar #22243
-#          - Angela Garcia #22869
+# Laboratorio - Construcción Directa de AFD y ecosistema de reconocimiento de expresiones regulares
+#autores: - Francis Alguilar, 22243
+#         - Cesar Lopez, 22505
+#         - Angela Garcia, 22869
+'''
+El objetivo es desarrollar la base del generador de analizadores léxicos. A partir de r deberá construir un AFD, utilizando el algoritmo de construcción directa.
+
+Objetivos
+
+Generales
+- Implementación de (algunos) algoritmos básicos de autómatas finitos y expresiones regulares.
+- Desarrollar la base de la implementación del generador de analizadores léxicos.
+
+especificos:
+Implementación del algoritmo de Construcción directa de AFD (DFA): el que vimos en este curso, que toma una RE y la transforma en un AFD.
+Implementación del algoritmo de Minimización de AFD (DFA), simulación de un AFN, simulación de un AFD, Generación visual de los AF, 
+Shunting yard para convertir de infix a postfix
+
+funcionamiento del programa:
+Debe aceptar expresiones regulares para definir el AFD y también cadenas para procesarlas.
+Al procesar las expresiones regulares, muestre en pantalla el AFD.
+Luego permita procesar cadenas, y para cada una indique si es aceptada o no.
+
+'''
 
 import os
-from typing import List, Tuple
 
-"""
-especificaciones:
-- El programa debe simular un búfer con un tamaño fijo de 10 caracteres.
-- Utilicen una lista de caracteres como entrada, terminando en un carácter especial eof.
-- Implementen dos punteros: inicio y avance, para simular la lectura del búfer.
-- Cuando el puntero avance alcance el final del búfer, recarguen los datos desde una entrada simulada.
-- El programa debe imprimir cada lexema (caracteres entre dos espacios o el final) procesado del búfer.
-
-"""
-ruta_actual = os.getcwd()
+from refactor import leerArchivo
+from regex import  infixToPostfix
 
 
-# leer el archivo
-def leer_archivo(archivo) -> str:
-    return open(archivo, "r").read()
 
+expresiones = leerArchivo('./expresiones.txt')
+print(expresiones)
 
-# Código base para iniciar
-def cargar_buffer(entrada: List[str], inicio: int, tamano_buffer: int) -> List[str]:
-    buffer = entrada[inicio : inicio + tamano_buffer]
-    return buffer
-
-
-def procesar_buffer(
-    bufferCount: int,
-    buffer: List[str],
-    lexema_incompleto: str = "",
-    tamaño_buffer: int = 10,
-    entradaLength: int = 10,
-) -> Tuple[List[str], str]:
-
-    avance = 0  # posición del puntero de avance
-
-    # Procesar y extraer lexemas del buffer
-    lexemas = []
-    lexema_actual = (
-        lexema_incompleto  # esto va a hacer que no se corte al final de cada buffer
-    )
-    bufferCount + 1
-
-    while avance < len(buffer):
-        caracter = buffer[avance]
-        avance += 1
-
-        # ignorar espacios
-        if caracter != " ":
-
-            # Si encuentra un salto de linea tratarlo como un eol
-            if caracter == "\n":
-                print(f"New Line")
-                lexemas.append(lexema_actual)
-            else:
-                # agregar caracter al lexema actual
-                lexema_actual += caracter
-            # Si llega al final del archivo, guardar el ultimo lexema
-            if avance + tamaño_buffer * bufferCount == entradaLength:
-                print("lexema procesado: " + lexema_actual)
-                lexemas.append(lexema_actual)
-
-        # Al encontrar un espacio, mostrar el lexema guardado
-        else:
-            # Agregar a la lista de lexemas y reiniciar el lexema actual
-            print("lexema procesado: " + lexema_actual)
-
-            if lexema_actual == "eof":
-                # si el lexema es eof, salir del ciclo
-                return ([], "EOF")
-            if lexema_actual == "eol":
-                print(f"New Line")
-            lexemas.append(lexema_actual)
-            lexema_actual = ""
-
-    if lexema_actual != "":
-        lexemas.append(lexema_actual)
-    return (
-        lexemas,
-        lexema_actual,
-    )  # devolver los lexemas y el incompleto   # retornar la lista de lexemas procesados del buffer
-
-
-entrada = list(leer_archivo("archivo.txt"))
-
-# puntero de inicio
-inicio = 0
-tamano_buffer = 10
-lexema_incompleto = ""
-bufferCount = 0
-
-while inicio <= len(entrada) + 1:
-    buffer = cargar_buffer(entrada, inicio, tamano_buffer)
-    lexemas, lexema_incompleto = procesar_buffer(
-        bufferCount,
-        buffer,
-        lexema_incompleto,
-        tamano_buffer,
-        len(entrada),
-    )
-    bufferCount += 1
-
-    if inicio >= len(entrada):
-        print("--------------- You have reaced the end of file ---------------")
-        break
-
-    if lexemas == [] and lexema_incompleto == "EOF":
-        print("--------------- You have reaced the end of file ---------------")
-        break
-    inicio += tamano_buffer  # avanzar el inicio del buffer para la próxima lectura
+for expresion in expresiones:
+    print("Expresion ingresada: \n"+expresion)
+    postfix = infixToPostfix(expresion)
+    print ("Expresion POSTFIX \n"+ postfix + "\n")
