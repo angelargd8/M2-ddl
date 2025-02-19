@@ -36,6 +36,7 @@ class Node:
         return f"Node(value={self.value}, id={self.id}, nullable={self.nullable}, firstpos={self.firstpos}, lastpos={self.lastpos})"
 
 #la tablita de siguientepos
+#en esto tambien nos ayudo la IA para verificar que todo estuviera bien
 def calcular_followPos(node, followpos):
 
     if node is None:

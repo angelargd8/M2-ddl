@@ -41,8 +41,7 @@ def construirAFD(postfix):
     #el followpos es la tablita para saber las posiciones que se tienen que seguir
     followpos = defaultdict(set)
     calcular_followPos(ArbolSintactico, followpos)
-    print(followpos)
-
+    # print(followpos)
     #construir el AFD
     afd = construir_AFD(ArbolSintactico, followpos)
     afd.mostrar()
