@@ -68,93 +68,77 @@ def construirArbol(e):
 def construirArbolSintactico(e):
     stack = []
     operators = {"|": 2, ".": 2, "*": 1, "+": 1, "#": 3}
-
-    for c in e:
+    
+    print("\nProcesando expresión:", e)
+    
+    for i, c in enumerate(e):
+        # print(f"Procesando: {c}")
+        # print("Stack actual:", [n.value for n in stack])
+        
         if c not in operators:
             node = Node(c)
-
             node.firstpos.add(node.id)
             node.lastpos.add(node.id)
             node.nullable = False
-
             stack.append(node)
+            continue
 
-        else:
-            if operators[c] == 3:
-                if c == "#":
-                    node = Node(c)
-                    node.nullable = False
-                    node.firstpos = set()
-                    node.lastpos = set()
-                    stack.append(node)
+        if c == "#":
+            if not stack:
+                raise ValueError(f"expresion postfix invalida: {e}")
+                
+            prev_node = stack.pop()
+            node = Node(c)
+            node.nullable = False
+            node.firstpos = prev_node.firstpos
+            node.lastpos = prev_node.lastpos
+            node.left = prev_node
+            node.right = None  # Aseguramos que right es None
+            stack.append(node)
+            continue
 
-            if operators[c] == 2:
-                if len(stack) < 2:
-                    raise ValueError(f"expresion postfix invalida: {e}")
+        if c in ["|", "."]:
+            if len(stack) < 2:
+                raise ValueError(f"expresion postfix invalida: {e}")
 
-                right_operand = stack.pop()
-                left_operand = stack.pop()
-                node = Node(c)
-                node.left = left_operand
-                node.right = right_operand
+            right = stack.pop()
+            left = stack.pop()
+            node = Node(c)
+            node.right = right
+            node.left = left
+            
+            if c == "|":
+                node.nullable = left.nullable or right.nullable
+                node.firstpos = left.firstpos.union(right.firstpos)
+                node.lastpos = left.lastpos.union(right.lastpos)
+            elif c == ".":
+                node.nullable = left.nullable and right.nullable
+                node.firstpos = left.firstpos if not left.nullable else left.firstpos.union(right.firstpos)
+                node.lastpos = right.lastpos if not right.nullable else right.lastpos.union(left.lastpos)
+            
+            stack.append(node)
+            continue
 
-                if c == "|":
-                    node.nullable = left_operand.nullable or right_operand.nullable
-                    node.firstpos = left_operand.firstpos.union(right_operand.firstpos)
-                    node.lastpos = left_operand.lastpos.union(right_operand.lastpos)
-                    print("node |")
-                    print(node)
-                elif c == ".":
-                    node.nullable = left_operand.nullable and right_operand.nullable
-                    if left_operand.nullable:
-                        node.firstpos = left_operand.firstpos.union(
-                            right_operand.firstpos
-                        )
-                    else:
-                        node.firstpos = left_operand.firstpos
+        if c in ["*", "+"]:
+            if not stack:
+                raise ValueError(f"expresion postfix invalida: {e}")
 
-                    if right_operand.nullable:
-                        node.lastpos = right_operand.lastpos.union(left_operand.lastpos)
-                    else:
-                        node.lastpos = right_operand.lastpos
-
-                    # print('node .')
-                    # print(node)
-
-                stack.append(node)
-            else:
-                if not stack:
-                    raise ValueError(f"expresion postfix invalida: {e}")
-
-                operand = stack.pop()
-                node = Node(c)
-                node.left = operand
-
-                if c == "*":
-                    node.nullable = True  # aqui es true porque como se puede repetir 0 o mas veces, siemrpe es nullable
-                    node.firstpos = operand.firstpos
-                    node.lastpos = operand.lastpos
-                    # print('node *')
-                    # print(node)
-
-                if c == "+":
-                    node.nullable = (
-                        operand.nullable
-                    )  # este solo puede ser nullable solo si la expresion se tiene que repetir una o mas veces
-                    node.firstpos = operand.firstpos
-                    node.lastpos = operand.lastpos
-                    # print('node +')
-                    # print(node)
-
-                stack.append(node)
+            operand = stack.pop()
+            node = Node(c)
+            node.left = operand
+            node.right = None  # Aseguramos que right es None
+            node.nullable = True if c == "*" else operand.nullable
+            node.firstpos = operand.firstpos
+            node.lastpos = operand.lastpos
+            stack.append(node)
 
     if len(stack) != 1:
         raise ValueError(f"expresion postfix invalida: {e}")
-
-    final_node = stack.pop()
-    print(final_node)
+        
+    final_node = stack[0]
+    
+    # Validación final
     if final_node.value != "#":
-        raise ValueError(f"expresion postfix invalida: {e}")
-
-    # print(stack)
+        raise ValueError(f"El nodo raíz debe ser '#', pero es '{final_node.value}'")
+    
     return final_node

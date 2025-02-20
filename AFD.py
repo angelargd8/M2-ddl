@@ -36,21 +36,36 @@ class AFD:
 
 def buscar_raiz(followpos):
     nodos = set(followpos.keys())
+    nodos2=  set(followpos.keys())
     valores = set()
 
     for conjunto in followpos.values():
         # print(conjunto)
         valores.update(conjunto)
 
-    raiz = nodos - valores
-    # print(f"Nodos: {nodos}")
-    # print(f"Valores: {valores}")
-    # print(f"Diferencia (Raiz): {raiz}")
-    if len(raiz) != 0:
-        raiz = list(raiz)[0]
-    else:
-        raiz = list(nodos)[0]
-    # print(f"Raiz final: {raiz}")
+    diferencia = nodos - valores
+    print(f"Nodos: {nodos}")
+    print(f"Valores: {valores}")
+    print(f"Diferencia (Raiz): {diferencia}")
+    print(f"\n ")
+
+    if len(diferencia) != 0:
+        raiz = list(diferencia)
+        raiz = raiz[0]
+        print(raiz)
+
+    # elif len(nodos) != 0:
+    #     raiz = list(nodos)
+    #     raiz = nodos[0]
+
+    elif len(diferencia) ==0: 
+        raiz = list(nodos2)[0]
+
+    #     raiz = list(nodos)[0]
+    # else:
+    #     raise ValueError("No se pudo encontrar la raíz porque 'nodos' está vacío.")
+
+    print(f"Raiz final: {raiz}")
     return raiz
 
 
@@ -76,6 +91,12 @@ def definir_estados_aceptacion(afd, posicion_aceptacion):
 
 
 def construir_AFD(arbolSintactico, followpos):
+    
+    print('arbolSintactico')
+    print(arbolSintactico)
+    print('followpos')
+    print(followpos)
+
     # instanciar afd
     afd = AFD()
     # 1. definir el estado inicial
@@ -89,27 +110,27 @@ def construir_AFD(arbolSintactico, followpos):
         # print(estados)
         afd.estados.append(estados)
 
-    # crear el alfabeto recorriendo el arbol
-    nodos = [arbolSintactico]
-    while nodos:
-        nodo = nodos.pop()
-        if (nodo.value.isalnum() and nodo.value != "ε") or (
-            nodo.value.isalnum() and nodo.value != "e"
-        ):
-            afd.alfabeto.add(nodo.value)
-        if nodo.left:
-            nodos.append(nodo.left)
-        if nodo.right:
-            nodos.append(nodo.right)
+    # # crear el alfabeto recorriendo el arbol
+    # nodos = [arbolSintactico]
+    # while nodos:
+    #     nodo = nodos.pop()
+    #     if (nodo.value.isalnum() and nodo.value != "ε") or (
+    #         nodo.value.isalnum() and nodo.value != "e"
+    #     ):
+    #         afd.alfabeto.add(nodo.value)
+    #     if nodo.left:
+    #         nodos.append(nodo.left)
+    #     if nodo.right:
+    #         nodos.append(nodo.right)
 
-    # 3. construir la tabla de transicion  con el follow pos
-    construir_tabla_transicion(afd, followpos, afd.alfabeto)
+    # # 3. construir la tabla de transicion  con el follow pos
+    # construir_tabla_transicion(afd, followpos, afd.alfabeto)
 
-    # 4. definir los estados de aceptacion
-    # identificar la posicion de aceptacion
-    posicion_aceptacion = max(followpos.keys())
+    # # 4. definir los estados de aceptacion
+    # # identificar la posicion de aceptacion
+    # posicion_aceptacion = max(followpos.keys())
 
-    # buscar los estados que tengan la posicion de aceptacion
-    definir_estados_aceptacion(afd, posicion_aceptacion)
+    # # buscar los estados que tengan la posicion de aceptacion
+    # definir_estados_aceptacion(afd, posicion_aceptacion)
 
-    return afd
+    # return afd

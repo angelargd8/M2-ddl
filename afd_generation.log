@@ -1,0 +1,176 @@
+2025-02-19 20:27:27,134 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:27:27,134 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:27:27,139 - __main__ - INFO - Arbol sintactico construido
+2025-02-19 20:27:27,139 - __main__ - INFO - Followpos calculado
+2025-02-19 20:28:38,795 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:28:38,796 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:28:38,802 - __main__ - INFO - Arbol sintactico construido
+2025-02-19 20:28:38,803 - __main__ - INFO - Followpos calculado
+2025-02-19 20:29:21,407 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:29:21,408 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:29:21,415 - __main__ - INFO - Arbol sintactico construido
+2025-02-19 20:29:46,391 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:29:46,392 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:29:46,397 - __main__ - INFO - Arbol sintactico construido
+2025-02-19 20:29:46,398 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:29:46,399 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:29:46,418 - __main__ - INFO - Arbol sintactico construido
+2025-02-19 20:29:46,418 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:29:46,420 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:29:46,429 - __main__ - INFO - Arbol sintactico construido
+2025-02-19 20:29:46,430 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:29:46,430 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:29:46,448 - __main__ - INFO - Arbol sintactico construido
+2025-02-19 20:29:46,448 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:29:46,448 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:29:46,460 - __main__ - INFO - Arbol sintactico construido
+2025-02-19 20:30:34,127 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:30:34,128 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:30:34,132 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:30:34,133 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:30:34,149 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:30:34,150 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:30:34,158 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:30:34,158 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:30:34,177 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:30:34,177 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:31:16,007 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:31:16,008 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:31:16,016 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:31:16,016 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:31:16,029 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:31:16,031 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:31:16,037 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:31:16,037 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:31:16,047 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:31:16,047 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:31:49,421 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:31:49,421 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:31:49,429 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:31:49,430 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:31:49,455 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:31:49,455 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:31:49,465 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:31:49,466 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:31:49,482 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:31:49,483 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:32:46,998 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:32:46,999 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:32:47,000 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:32:47,001 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:32:47,005 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:32:47,007 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:32:47,012 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:32:47,013 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:32:47,017 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:32:47,018 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:33:35,260 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:33:35,261 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:33:35,261 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:33:35,262 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:33:35,265 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:33:35,266 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:33:35,268 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:33:35,268 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:33:35,269 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:33:35,270 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:34:01,430 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:34:01,431 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:34:01,431 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:34:01,431 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:34:01,431 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:34:01,432 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:34:01,433 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:34:01,434 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:34:01,435 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:34:01,436 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:34:25,085 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:34:25,086 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:34:25,087 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:34:25,088 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:34:25,090 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:34:25,091 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:34:25,094 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:34:25,095 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:34:25,096 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:34:25,097 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:34:50,778 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:34:50,779 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:34:50,780 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:34:50,780 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:34:50,783 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:34:50,785 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:34:50,788 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:34:50,789 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:34:50,790 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:34:50,790 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:35:12,987 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:35:12,988 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:35:12,990 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:35:12,991 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:35:12,993 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:35:12,994 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:35:12,996 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:35:12,998 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:35:13,001 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:35:13,002 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:36:22,817 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:36:22,818 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:36:22,819 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:36:22,819 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:36:22,822 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:36:22,823 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:36:22,826 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:36:22,827 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:36:22,830 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:36:22,830 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:36:50,360 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:36:50,361 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:36:50,362 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:36:50,363 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:36:50,365 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:36:50,365 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:36:50,369 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:36:50,369 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:36:50,371 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:36:50,372 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:37:56,750 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:37:56,750 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:37:56,751 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:37:56,751 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:37:56,752 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:37:56,753 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:37:56,754 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:37:56,754 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:37:56,756 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:37:56,757 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:38:34,415 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:38:34,415 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:38:34,416 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:38:34,416 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:38:34,422 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:38:34,423 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:38:34,427 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:38:34,429 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:38:34,437 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:38:34,438 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:40:38,553 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:40:38,554 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:40:38,555 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:40:38,557 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:40:38,564 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:40:38,565 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:40:38,567 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:40:38,570 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:40:38,577 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:40:38,577 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#
+2025-02-19 20:41:19,380 - __main__ - INFO - Procesando expresion 1: a|b
+2025-02-19 20:41:19,381 - __main__ - INFO - Expresion POSTFIX: ab|#
+2025-02-19 20:41:19,382 - __main__ - INFO - Procesando expresion 2: (a*|b*)+
+2025-02-19 20:41:19,383 - __main__ - INFO - Expresion POSTFIX: a*b*|a*b*|*.#
+2025-02-19 20:41:19,384 - __main__ - INFO - Procesando expresion 3: (a?|b*)*
+2025-02-19 20:41:19,384 - __main__ - INFO - Expresion POSTFIX: ea|b*|*#
+2025-02-19 20:41:19,385 - __main__ - INFO - Procesando expresion 4: (a|b)*abb(a|b)*
+2025-02-19 20:41:19,387 - __main__ - INFO - Expresion POSTFIX: ab|*a.b.b.ab|*.#
+2025-02-19 20:41:19,388 - __main__ - INFO - Procesando expresion 5: 0?(1?)?0*
+2025-02-19 20:41:19,389 - __main__ - INFO - Expresion POSTFIX: e0|ee1||.0*.#

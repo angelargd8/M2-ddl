@@ -46,10 +46,14 @@ def calcular_followPos(node, followpos):
     calcular_followPos(node.left, followpos)
     calcular_followPos(node.right, followpos)
 
-    if node.value == ".":
+    if node.value == '.':
         for pos in node.left.lastpos:
+            if pos not in followpos:
+                followpos[pos] = set()
             followpos[pos].update(node.right.firstpos)
 
-    if node.value == "*":
+    if node.value == '*':
         for pos in node.lastpos:
+            if pos not in followpos:
+                followpos[pos] = set()
             followpos[pos].update(node.firstpos)
