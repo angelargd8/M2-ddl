@@ -55,10 +55,10 @@ for i, expresion in enumerate(expresiones):
 
     afd = construirAFD(postfix)
 
-    # afd.mostrar()
-    # logger.info('AFD mostrado')
+    afd.mostrar()
+    logger.info('AFD mostrado')
 
-    # # Generar la imagen del AFD usando la función de visualización
-    # # Aquí usamos la expresión regular como parte del nombre, pero se sanitiza internamente.
-    # visualize_afd(afd, output_dir="Visual_AFD", file_name=f"AFD_{i}")
-    # logger.info(f'Imagen del AFD generada: AFD_{i}')
+    # Generar la imagen del AFD usando la función de visualización
+    # Aquí usamos la expresión regular como parte del nombre, pero se sanitiza internamente.
+    visualize_afd(afd, output_dir="Visual_AFD", file_name=f"AFD_{i}")
+    logger.info(f'Imagen del AFD generada: AFD_{i}')
