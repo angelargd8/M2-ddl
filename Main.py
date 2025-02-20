@@ -41,6 +41,7 @@ def construirAFD(postfix):
 
     # # construir el AFD
     afd = construir_AFD(ArbolSintactico, followpos)
+    afd = minimizar_afd(afd)
     # # logger.info('AFD construido')
     return afd
 

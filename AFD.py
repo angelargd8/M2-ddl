@@ -134,3 +134,71 @@ def construir_AFD(arbolSintactico, followpos):
     definir_estados_aceptacion(afd, posicion_aceptacion)
 
     return afd
+
+
+def minimizar_afd(afd):
+    # Paso 1: Inicializar la partición con dos grupos: estados finales y no finales
+    particion = [set(afd.estados_finales), set(afd.estados) - set(afd.estados_finales)]
+
+    # Paso 2: Refinar la partición hasta que no haya cambios
+    while True:
+        nueva_particion = []
+        for grupo in particion:
+            if len(grupo) <= 1:
+                nueva_particion.append(grupo)
+                continue
+
+            # Crear un diccionario para almacenar las transiciones de cada estado en el grupo
+            transiciones_grupo = {}
+            for estado in grupo:
+                transiciones_grupo[estado] = {}
+                for simbolo in afd.alfabeto:
+                    estado_destino = afd.transiciones[estado].get(simbolo, None)
+                    transiciones_grupo[estado][simbolo] = estado_destino
+
+            # Crear un diccionario para agrupar estados con las mismas transiciones
+            grupos_transiciones = defaultdict(list)
+            for estado, transiciones in transiciones_grupo.items():
+                grupos_transiciones[tuple((k, tuple(sorted(v))) for k, v in transiciones.items())].append(estado)
+
+
+            # Agregar los nuevos grupos a la nueva partición
+            for nuevo_grupo in grupos_transiciones.values():
+                nueva_particion.append(set(nuevo_grupo))
+
+        # Si la partición no cambia, terminamos
+        if nueva_particion == particion:
+            break
+        particion = nueva_particion
+
+    # Paso 3: Crear el AFD minimizado
+    afd_minimizado = AFD()
+    afd_minimizado.alfabeto = afd.alfabeto
+
+    # Mapear cada estado original a su representante en el AFD minimizado
+    mapeo_estados = {}
+    for grupo in particion:
+        representante = min(grupo)  # Elegir el estado con el menor valor como representante
+        for estado in grupo:
+            mapeo_estados[estado] = representante
+
+    # Agregar los estados al AFD minimizado
+    afd_minimizado.estados = list(set(mapeo_estados.values()))
+
+    # Agregar el estado inicial
+    afd_minimizado.agregar_estado_inicial(mapeo_estados[afd.estado_inicial])
+
+    # Agregar los estados finales
+    for estado_final in afd.estados_finales:
+        afd_minimizado.agregar_estado_final(mapeo_estados[estado_final])
+
+    # Agregar las transiciones
+    for estado in afd_minimizado.estados:
+        for simbolo in afd_minimizado.alfabeto:
+            estado_destino = afd.transiciones[estado].get(simbolo, None)
+            if estado_destino is not None:
+                if isinstance(estado_destino, set) and estado_destino:
+                    estado_destino = min(estado_destino)  # Elegir un estado representativo
+                afd_minimizado.agregar_transiciones(estado, simbolo, mapeo_estados.get(estado_destino, None))
+
+    return afd_minimizado
