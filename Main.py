@@ -1,5 +1,6 @@
 import os
-from constructor import leerArchivo, construirArbolSintactico, construirArbol
+from constructor import leerArchivo
+from Arboles import  construirArbolSintactico, imprimirArbolSintactico
 from regex import infixToPostfix
 from afn import *
 from AFD import *
@@ -29,19 +30,23 @@ stream_handler.setFormatter(formatter)
 def construirAFD(postfix):
     # construir el arbol sintactico para la cadena
     ArbolSintactico = construirArbolSintactico(postfix)
-    # print(ArbolSintactico)
-    # logger.info('Arbol sintactico construido')
+
+    if ArbolSintactico:
+        print("arbol construido correctamente")
+        imprimirArbolSintactico(ArbolSintactico, "", True)
+        
+    else:
+        print("Error al construir el arbol sintactico")
 
     # # el followpos es la tablita para saber las posiciones que se tienen que seguir
     followpos = defaultdict(set)
     calcular_followPos(ArbolSintactico, followpos)
-    # # logger.info('Followpos calculado')
-    # print('followpos')
-    # print(followpos)
 
-    # # construir el AFD
+
+    # # # construir el AFD
     afd = construir_AFD(ArbolSintactico, followpos)
-    # # logger.info('AFD construido')
+
+
     return afd
 
 
@@ -49,9 +54,9 @@ expresiones = leerArchivo("./expresiones.txt")
 
 # Procesar cada expresión regular y generar el AFD
 for i, expresion in enumerate(expresiones):
-    logger.info(f'Procesando expresion {i+1}: {expresion}')
+    logger.info(f'Procesando expresion {i+1}: {expresion} \n')
     postfix = infixToPostfix(expresion)
-    logger.info(f'Expresion POSTFIX: {postfix}')
+    print(f'Expresion POSTFIX: {postfix}\n')
 
     afd = construirAFD(postfix)
 
