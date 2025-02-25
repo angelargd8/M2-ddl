@@ -92,11 +92,6 @@ def definir_estados_aceptacion(afd, posicion_aceptacion):
 
 def construir_AFD(arbolSintactico, followpos):
     
-    print('arbolSintactico')
-    print(arbolSintactico)
-    print('followpos')
-    print(followpos)
-
     # instanciar afd
     afd = AFD()
     # 1. definir el estado inicial
