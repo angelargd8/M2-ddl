@@ -1,2 +1,14 @@
+# Virtual Environment
 /VirtualEnv
+/env
+/venv
+
+# enviroment variables
+.env
+
+# Images
+Visual_AFD/*
+
+# pycache
 __pycache__
+*pyc
