@@ -82,7 +82,7 @@ def infixToPostfix(regex):
     postfix = ""
     stack = []
     regex = formatRegEx(regex)
-    print("Expresion formateada: \n" + regex)
+    print("\nExpresion formateada: \n" + regex)
 
     i = 0
 
