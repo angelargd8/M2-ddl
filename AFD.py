@@ -70,18 +70,18 @@ def buscar_raiz(followpos):
 
 
 def construir_tabla_transicion(afd, followpos, alfabeto):
-    # recorrer los estados y el follow pos
+     # recorrer los estados y el follow pos
     for estado, posiciones in followpos.items():
+        afd.transiciones[estado] = {}  
+        
+        # recorrer las posiciones
         for pos in posiciones:
-            afd.transiciones[estado] = {}
-
-        # recorrer el alfabeto
-        for simbolo in alfabeto:
-            if simbolo not in afd.transiciones[estado]:
-                afd.transiciones[estado][simbolo] = set()
-            afd.transiciones[estado][simbolo].add(pos)
-    return afd.transiciones
-
+            # recorrer el alfabeto
+            for simbolo in alfabeto:
+                if simbolo not in afd.transiciones[estado]:
+                    afd.transiciones[estado][simbolo] = set()
+                afd.transiciones[estado][simbolo].add(pos)
+    return  afd.transiciones
 
 def definir_estados_aceptacion(afd, posicion_aceptacion):
     for estado in afd.estados:
