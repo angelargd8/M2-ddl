@@ -59,8 +59,6 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.firstpos = node.left.firstpos.copy()
             node.lastpos = node.left.lastpos.copy()
 
-            # print('node para + o *')
-            # print(node.__str__())
             stack.append(node)
             continue
 
@@ -82,18 +80,15 @@ def construirArbolSintactico(postfix: str) -> Node:
 
 
                 if node.right.nullable:
-                    node.lastpos = node.right.lastpos.union(node.right.lastpos) #left
+                    node.lastpos = node.right.lastpos.union(node.left.lastpos)
                 else:
                     node.lastpos = node.right.lastpos.copy()
 
-                # print('node para .')
-                # print(node.__str__())
 
             if simbolo == "|":
                 node.firstpos = node.left.firstpos.union(node.right.firstpos)
                 node.lastpos = node.right.lastpos.union(node.left.lastpos)
-                # print('node para |')
-                # print(node.__str__())
+                node.nullable = node.left.nullable or node.right.nullable
 
             stack.append(node)
             continue
@@ -107,20 +102,18 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.right = None
             node.nullable = False
             #cuando son de anclaje no cambian los firstpos y lastpos
-            node.firstpos = node.left.firstpos
-            node.lastpos = node.left.lastpos
+            node.firstpos = node.left.firstpos.copy()
+            node.lastpos = node.left.lastpos.copy()
 
             stack.append(node)
             continue
 
         if simbolo =="e" or simbolo == 'ε':
-            print('creando nodo epsilon')
             node = Node(simbolo)
             node.firstpos.add(node.id)
             node.lastpos.add(node.id)
             node.nullable = True
             stack.append(node)
-            print(f"DEBUG - Nodo epsilon creado: {node.__str__()}")
             continue
 
     
