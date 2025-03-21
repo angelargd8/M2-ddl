@@ -128,8 +128,9 @@ def construir_AFD(arbolSintactico, followpos):
     # buscar los estados que tengan la posicion de aceptacion
     definir_estados_aceptacion(afd, posicion_aceptacion)
 
-    return minimizar_AFD(afd)
-    # return afd
+    return afd
+    # return minimizar_AFD(afd)
+
 
 def minimizar_AFD(afd):
     particion = [set(afd.estados_finales), set(afd.estados) - set(afd.estados_finales)]
