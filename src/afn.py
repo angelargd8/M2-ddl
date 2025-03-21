@@ -1,5 +1,5 @@
 # from graphviz import Graph
-from estados import Estado
+from src.estados import Estado
 
 class Afn:
     def __init__(self):

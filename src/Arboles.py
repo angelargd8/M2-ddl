@@ -1,7 +1,5 @@
-import os
-from typing import List, Tuple, Union
-from node import *
-from collections import deque, defaultdict
+from src.node import *
+
 
 #arbol sintactico
 #1. preparar stack vacio

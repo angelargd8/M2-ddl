@@ -1,12 +1,10 @@
-import os
 from constructor import leerArchivo
 from Arboles import  construirArbolSintactico, imprimirArbolSintactico
-from regex import infixToPostfix
-from afn import *
+from src.regex import infixToPostfix
 from AFD import *
-from node import *
-from collections import deque, defaultdict
-from graficadora import visualize_afd
+from src.node import *
+from collections import defaultdict
+from src.graficadora import visualize_afd
 import logging
 
 # Create a logger
@@ -50,7 +48,7 @@ def construirAFD(postfix):
     return afd
 
 
-expresiones = leerArchivo("./expresiones.txt")
+expresiones = leerArchivo("../expresiones.txt")
 
 # Procesar cada expresión regular y generar el AFD
 for i, expresion in enumerate(expresiones):
