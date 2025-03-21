@@ -1,4 +1,4 @@
-from metachar import Metachar
+from Automata.metachar import Metachar
 
 
 # funcion para formatear la expresion regular para que se pueda trabajar con ella

@@ -1,4 +1,4 @@
-from Node import *
+from Automata.Node import *
 
 
 #arbol sintactico

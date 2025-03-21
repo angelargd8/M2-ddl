@@ -1,10 +1,10 @@
-from constructor import leerArchivo
-from arboles import construirArbolSintactico, imprimirArbolSintactico
-from Regex import infixToPostfix
-from AFD import *
-from Node import *
+from Automata.constructor import leerArchivo
+from Automata.arboles import construirArbolSintactico, imprimirArbolSintactico
+from Automata.Regex import infixToPostfix
+from Automata.AFD import *
+from Automata.Node import *
 from collections import defaultdict
-from graficadora import visualize_afd
+from Automata.graficadora import visualize_afd
 import logging
 
 # Create a logger

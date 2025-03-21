@@ -1,5 +1,5 @@
 # from graphviz import Graph
-from estado import Estado
+from Automata.estado import Estado
 
 class Afn:
     def __init__(self):
