@@ -1,7 +1,7 @@
 from constructor import leerArchivo
 from arboles import construirArbolSintactico, imprimirArbolSintactico
 from Regex import infixToPostfix
-from AFD import *
+from Automata.AFD import *
 from node import *
 from collections import defaultdict
 from graficadora import visualize_afd
