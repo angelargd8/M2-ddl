@@ -57,10 +57,10 @@ def calcular_followPos(node, followpos):
 
 
     if node.value in ['+', '*']:
-        for pos in node.lastpos:
+        for pos in node.left.lastpos:
             if pos not in followpos:
                 followpos[pos] = set()
-            followpos[pos].update(node.firstpos)
+            followpos[pos].update(node.left.firstpos)
 
     for pos in node.firstpos.union(node.lastpos):
         if pos not in followpos:
