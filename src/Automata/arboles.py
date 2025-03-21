@@ -1,4 +1,4 @@
-from node import *
+from Node import *
 
 
 #arbol sintactico
@@ -14,7 +14,7 @@ from node import *
 def construirArbolSintactico(postfix: str) -> Node:
     #1
     stack = []
-    operators = {"|": 2, ".": 2, "*": 1, "+": 1, "#": 3, "^":5}
+    operators = {"|": 2, ".": 2, "*": 1, "+": 1, "?":1 , "#": 3, "^":5, "e":6, "ε":6}
 
     print('procesando la expresion postfix: ' + postfix)
 
@@ -44,14 +44,14 @@ def construirArbolSintactico(postfix: str) -> Node:
             continue
 
 
-        if simbolo in ["*", "+"]:
+        if simbolo in ["*", "+",  "?"]:
             node = Node(simbolo)
 
             node.left = stack.pop()
             node.right = None
             
 
-            if simbolo == "*":
+            if simbolo == "*" or simbolo == "?":        # '*' y '?' permiten 0 ocurrencias, por eso son anulables
                 node.nullable = True
             else:  
                 node.nullable = node.left.nullable
@@ -114,11 +114,13 @@ def construirArbolSintactico(postfix: str) -> Node:
             continue
 
         if simbolo =="e" or simbolo == 'ε':
+            print('creando nodo epsilon')
             node = Node(simbolo)
             node.firstpos.add(node.id)
             node.lastpos.add(node.id)
             node.nullable = True
             stack.append(node)
+            print(f"DEBUG - Nodo epsilon creado: {node.__str__()}")
             continue
 
     

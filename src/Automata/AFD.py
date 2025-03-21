@@ -120,8 +120,8 @@ def construir_AFD(arbolSintactico, followpos):
         if posicion_fin in estado_actual:
             afd.agregar_estado_final(id_estado_actual)
 
-    # return afd
-    return minimizar_AFD(afd)
+    return afd
+    # return minimizar_AFD(afd)
 
 
 def minimizar_AFD(afd):
