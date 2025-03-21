@@ -2,7 +2,7 @@ from constructor import leerArchivo
 from arboles import construirArbolSintactico, imprimirArbolSintactico
 from Regex import infixToPostfix
 from AFD import *
-from node import *
+from Node import *
 from collections import defaultdict
 from graficadora import visualize_afd
 import logging

@@ -1,4 +1,4 @@
-from node import *
+from Node import *
 
 
 #arbol sintactico
