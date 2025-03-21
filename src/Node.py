@@ -2,6 +2,7 @@
 
 
 class Node:
+    
     latest_id = 0
     # tree_graph = Graph(format='png')
 

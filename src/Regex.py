@@ -1,4 +1,4 @@
-from Metachar import Metachar
+from metachar import Metachar
 
 
 # funcion para formatear la expresion regular para que se pueda trabajar con ella
@@ -115,5 +115,5 @@ def infixToPostfix(regex):
     while len(stack) > 0:
         postfix += stack.pop()
 
-    postfix += "#"
+    postfix += "#."
     return postfix

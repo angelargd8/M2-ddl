@@ -1,4 +1,4 @@
-from src.node import *
+from Node import *
 
 
 #arbol sintactico
@@ -36,19 +36,11 @@ def construirArbolSintactico(postfix: str) -> Node:
             
 
         if simbolo == "#":
-            if not stack:
-                raise ValueError(f"expresion postfix invalida: {postfix}")
-
             node = Node(simbolo)
-            node.firstpos.add(i+1)
-            node.lastpos.add(i+1)
+            node.firstpos.add(node.id)
+            node.lastpos.add(node.id)
             node.nullable = False
-            # print('node para #')
-            # print(node.__str__())
-
-            node_punto = stack.pop()
-            node_punto.right = node
-            stack.append(node_punto)
+            stack.append(node)
             continue
 
 

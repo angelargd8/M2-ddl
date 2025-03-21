@@ -1,6 +1,5 @@
 from collections import deque, defaultdict
 
-
 class AFD:
     def __init__(self):
         self.estados = []
