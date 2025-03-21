@@ -50,7 +50,6 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.left = stack.pop()
             node.right = None
             
-            # node.nullable = True if simbolo == "*" else False
 
             if simbolo == "*":
                 node.nullable = True
@@ -87,8 +86,6 @@ def construirArbolSintactico(postfix: str) -> Node:
                 else:
                     node.lastpos = node.right.lastpos.copy()
 
-                # node.firstpos = node.left.firstpos if node.left.nullable else node.left.firstpos.union(node.right.firstpos)
-                # node.lastpos = node.right.lastpos if node.right.nullable else node.right.lastpos.union(node.left.lastpos)
                 # print('node para .')
                 # print(node.__str__())
 
