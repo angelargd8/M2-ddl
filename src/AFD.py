@@ -120,35 +120,46 @@ def construir_AFD(arbolSintactico, followpos):
         if posicion_fin in estado_actual:
             afd.agregar_estado_final(id_estado_actual)
 
-    return afd
+    # return afd
+    return minimizar_AFD(afd)
 
 
 def minimizar_AFD(afd):
+    # 1. Inicializar partición con estados finales y no finales
     particion = [set(afd.estados_finales), set(afd.estados) - set(afd.estados_finales)]
     nueva_particion = []
-    
+
     while nueva_particion != particion:
         if nueva_particion:
             particion = nueva_particion
         nueva_particion = []
-        
+
         for grupo in particion:
             subgrupos = defaultdict(set)
+
             for estado in grupo:
-                clave = tuple((simbolo, encontrar_grupo(afd.transiciones.get(estado, {}).get(simbolo), particion)) for simbolo in afd.alfabeto)
+                # Clave única para identificar cómo el estado se comporta con cada símbolo
+                clave = tuple(
+                    (simbolo, frozenset(encontrar_grupo(afd.transiciones.get(estado, {}).get(simbolo), particion) or {}))
+                    for simbolo in afd.alfabeto
+                )
                 subgrupos[clave].add(estado)
+
             nueva_particion.extend(subgrupos.values())
-    
+
+    # 2. Crear nuevo AFD minimizado
     nuevo_afd = AFD()
     representantes = {next(iter(grupo)): grupo for grupo in nueva_particion if grupo}
-    
+
     for representante, grupo in representantes.items():
         nuevo_afd.estados.append(representante)
+
         if representante in afd.estados_finales:
             nuevo_afd.agregar_estado_final(representante)
+
         if representante == afd.estado_inicial:
             nuevo_afd.agregar_estado_inicial(representante)
-        
+
         for simbolo in afd.alfabeto:
             destino = afd.transiciones.get(representante, {}).get(simbolo)
             if destino is not None:
@@ -157,12 +168,12 @@ def minimizar_AFD(afd):
                     destino_representante = next(iter(grupo_destino), None)
                     if destino_representante is not None:
                         nuevo_afd.agregar_transiciones(representante, simbolo, destino_representante)
-    
-    nuevo_afd.alfabeto = afd.alfabeto
 
+    nuevo_afd.alfabeto = afd.alfabeto
     return nuevo_afd
 
 def encontrar_grupo(estado, particion):
+    """ Encuentra a qué grupo pertenece un estado en la partición """
     if estado is None:
         return None
     for grupo in particion:
