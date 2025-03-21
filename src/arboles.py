@@ -49,9 +49,17 @@ def construirArbolSintactico(postfix: str) -> Node:
 
             node.left = stack.pop()
             node.right = None
-            node.firstpos = node.left.firstpos
-            node.lastpos = node.left.lastpos
-            node.nullable = True if simbolo == "*" else False
+            
+            # node.nullable = True if simbolo == "*" else False
+
+            if simbolo == "*":
+                node.nullable = True
+            else:  
+                node.nullable = node.left.nullable
+
+            node.firstpos = node.left.firstpos.copy()
+            node.lastpos = node.left.lastpos.copy()
+
             # print('node para + o *')
             # print(node.__str__())
             stack.append(node)
@@ -67,8 +75,20 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.nullable = node.left.nullable and node.right.nullable
             
             if simbolo == ".":
-                node.firstpos = node.left.firstpos if node.left.nullable else node.left.firstpos.union(node.right.firstpos)
-                node.lastpos = node.right.lastpos if node.right.nullable else node.right.lastpos.union(node.left.lastpos)
+
+                if node.left.nullable:
+                    node.firstpos = node.left.firstpos.union(node.right.firstpos)
+                else:
+                    node.firstpos = node.left.firstpos.copy()
+
+
+                if node.right.nullable:
+                    node.lastpos = node.right.lastpos.union(node.right.lastpos) #left
+                else:
+                    node.lastpos = node.right.lastpos.copy()
+
+                # node.firstpos = node.left.firstpos if node.left.nullable else node.left.firstpos.union(node.right.firstpos)
+                # node.lastpos = node.right.lastpos if node.right.nullable else node.right.lastpos.union(node.left.lastpos)
                 # print('node para .')
                 # print(node.__str__())
 
@@ -96,6 +116,14 @@ def construirArbolSintactico(postfix: str) -> Node:
             stack.append(node)
             continue
 
+        if simbolo =="e" or simbolo == 'ε':
+            node = Node(simbolo)
+            node.firstpos.add(node.id)
+            node.lastpos.add(node.id)
+            node.nullable = True
+            stack.append(node)
+            continue
+
     
     # print('stack:')
     # for i in stack:
@@ -120,10 +148,10 @@ def imprimirArbolSintactico(nodo: Node, sangria: str = "", es_ultimo: bool = Tru
     # nodo actual con sangria
     if sangria:
         if es_ultimo:
-            print(sangria + "└─ " + str(nodo.value))
+            print(sangria + "└─ " + str(nodo.value) + " (" + str(nodo.nullable) +  ") " )# + str(nodo.firstpos))
             sangria_nueva = sangria + "   "
         else:
-            print(sangria + "├─ " + str(nodo.value))
+            print(sangria + "├─ " + str(nodo.value) + " (" + str(nodo.nullable) +   ") " )# + str(nodo.firstpos) )
             sangria_nueva = sangria + "│  "
     else:
         print(str(nodo.__str__()))

@@ -44,17 +44,32 @@ def calcular_followPos(node, followpos):
     if node is None:
         return
 
+    #procesar los hijos
     calcular_followPos(node.left, followpos)
     calcular_followPos(node.right, followpos)
 
+    #concatenacion
     if node.value == '.':
         for pos in node.left.lastpos:
             if pos not in followpos:
                 followpos[pos] = set()
             followpos[pos].update(node.right.firstpos)
 
-    if node.value == '*':
+
+    if node.value in ['+', '*']:
         for pos in node.lastpos:
             if pos not in followpos:
                 followpos[pos] = set()
             followpos[pos].update(node.firstpos)
+
+    for pos in node.firstpos.union(node.lastpos):
+        if pos not in followpos:
+            followpos[pos] = set()
+
+
+    # if node.value == '*':
+    #     for pos in node.lastpos:
+    #         if pos not in followpos:
+    #             followpos[pos] = set()
+    #         followpos[pos].update(node.firstpos)
+
