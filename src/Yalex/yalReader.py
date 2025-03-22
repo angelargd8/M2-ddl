@@ -8,7 +8,7 @@ class yalReader:
         self.rules_tokens = []
         self.header = ""
         self.trailer = ""
-        self.simbols = "+*|()[]-"
+        self.simbols = "+*|()[]-?'"
 
         # self.remove_comments()
         # self.read_yalex()
@@ -44,13 +44,20 @@ class yalReader:
                             if i+2 < len(expresion):
                                 new_exp += "|"
                         if expresion[i] == "\"": # si la expresion empieza con " comillas dobles, significa que la separacion es diferente
-                            pass
-                        if expresion[i] == "]":
+                            i += 1
+                            while expresion[i] != "\"":
+                                new_exp += expresion[i]
+                                i += 1
+                                if i + 2 < len(expresion):
+                                    new_exp += "|"
+
+                        if expresion[i] == "]": # termina la cadena dentro de []
                             cadena = False
                             i += 1
 
                 else: # significa que hace referencia a otra variable y hay que remplazarla
                     # leemos letra por letra hasta encontrar un simbolo
+                    temp = ""
                     # se guarda en un temp para evaluar si existe en el diccionario
                     # si existen se remplaza por el valor que ya tenia
                     pass

@@ -46,6 +46,10 @@ yal3 = yalReader("['a'-'d']")
 yal3.list.append("delim")
 yal3.dicc = {"delim": "['a'-'d']"}
 
+yal4 = yalReader("[\" \t\n\"]")
+yal4.list.append("delim")
+yal4.dicc = {"delim": "[\" \t\n\"]"}
+
 class MyTestCase(unittest.TestCase):
     def test_delete_comments(self):
         self.assertEqual(yal.remove_comments(), code2)  # add assertion here
@@ -58,6 +62,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_parse2(self):
         self.assertEqual("a|b|c|d", yal3.parse())
+
+    def test_parse3(self):
+        self.assertEqual(" |\t|\n", yal4.parse())
 
     def test_ascci(self):
         self.assertEqual("b|c|d", yal2.get_ascii("a", "d"))
