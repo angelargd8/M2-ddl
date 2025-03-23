@@ -1,7 +1,6 @@
 # visualizador.py
 import os
 from graphviz import Digraph
-import re
 
 def escaped_symbol(symbol):
     if symbol.startswith("\\"):

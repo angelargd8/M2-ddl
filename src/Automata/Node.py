@@ -20,13 +20,10 @@ class Node:
 
     # imprimir el arbol en formato grafico
     def printTree(self):
-        # Node.tree_graph.node(str(self.id), self.value)
         if self.left:
-            # Node.tree_graph.edge(str(self.id), str(self.left.id))
             self.left.printTree()
 
         if self.right:
-            # Node.tree_graph.edge(str(self.id), str(self.right.id))
             self.right.printTree()
 
     # renderizr el arbol y guardarlo en un archivo
@@ -65,11 +62,3 @@ def calcular_followPos(node, followpos):
     for pos in node.firstpos.union(node.lastpos):
         if pos not in followpos:
             followpos[pos] = set()
-
-
-    # if node.value == '*':
-    #     for pos in node.lastpos:
-    #         if pos not in followpos:
-    #             followpos[pos] = set()
-    #         followpos[pos].update(node.firstpos)
-

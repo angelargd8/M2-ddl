@@ -47,8 +47,6 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos.add(node.id)
             node.nullable = False
             stack.append(node)
-            # print('variable')
-            # print(node.__str__())
             i += 1
             continue
             
@@ -136,8 +134,6 @@ def construirArbolSintactico(postfix: str) -> Node:
 
         if simbolo =="e" or simbolo == 'ε':
             node = Node(simbolo)
-            # node.firstpos.add(node.id)
-            # node.lastpos.add(node.id)
             node.nullable = True
             stack.append(node)
             i += 1
@@ -146,10 +142,6 @@ def construirArbolSintactico(postfix: str) -> Node:
         #si se llega aca hay un simbolo no reconocido
         raise ValueError(f"simbolo no reconocido en postfix: {simbolo}")
     
-    
-    # print('stack:')
-    # for i in stack:
-    #     print(i.__str__())
 
     if len(stack) == 1:
         print('arbol sintactico construido correctamente')
