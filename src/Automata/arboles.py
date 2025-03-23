@@ -19,9 +19,25 @@ def construirArbolSintactico(postfix: str) -> Node:
     print('procesando la expresion postfix: ' + postfix)
 
     # 2
-    for i, simbolo in enumerate(postfix):
+    i = 0 
+
+    while i < len(postfix): 
+        simbolo = postfix[i]
         print('procesando simbolo: ' + simbolo)
 
+        #manejar simbolos escapados
+        if simbolo == "\\" and i + 1 < len(postfix):
+            #tratar el simbolo escapado como una unidad
+            simbolo_escapado = simbolo + postfix[i + 1]
+            node = Node(simbolo_escapado)
+            node.firstpos.add(node.id)
+            node.lastpos.add(node.id)
+            node.nullable = False
+            stack.append(node)
+            i +=2
+            continue
+
+    #for i, simbolo in enumerate(postfix):
         #operando (valor o variable)
         if simbolo not in operators:
             # 3
@@ -32,6 +48,7 @@ def construirArbolSintactico(postfix: str) -> Node:
             stack.append(node)
             # print('variable')
             # print(node.__str__())
+            i += 1
             continue
             
 
@@ -41,12 +58,17 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos.add(node.id)
             node.nullable = False
             stack.append(node)
+            i += 1
             continue
 
 
         if simbolo in ["*", "+",  "?"]:
-            node = Node(simbolo)
 
+            #verificar si hay operandos disponibles
+            if not stack:
+                raise ValueError(f"expresion postfix invalida: {postfix}")
+
+            node = Node(simbolo)
             node.left = stack.pop()
             node.right = None
             
@@ -60,6 +82,7 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos = node.left.lastpos.copy()
 
             stack.append(node)
+            i += 1
             continue
 
         if simbolo in [".", "|"]:
@@ -91,6 +114,7 @@ def construirArbolSintactico(postfix: str) -> Node:
                 node.nullable = node.left.nullable or node.right.nullable
 
             stack.append(node)
+            i += 1
             continue
 
         if simbolo =="^":
@@ -106,6 +130,7 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos = node.left.lastpos.copy()
 
             stack.append(node)
+            i += 1
             continue
 
         if simbolo =="e" or simbolo == 'ε':
@@ -114,8 +139,12 @@ def construirArbolSintactico(postfix: str) -> Node:
             # node.lastpos.add(node.id)
             node.nullable = True
             stack.append(node)
+            i += 1
             continue
 
+        #si se llega aca hay un simbolo no reconocido
+        raise ValueError(f"simbolo no reconocido en postfix: {simbolo}")
+    
     
     # print('stack:')
     # for i in stack:
