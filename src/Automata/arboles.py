@@ -29,6 +29,7 @@ def construirArbolSintactico(postfix: str) -> Node:
         if simbolo == "\\" and i + 1 < len(postfix):
             #tratar el simbolo escapado como una unidad
             simbolo_escapado = simbolo + postfix[i + 1]
+            print(f"Encontrado símbolo escapado: {repr(simbolo_escapado)}")
             node = Node(simbolo_escapado)
             node.firstpos.add(node.id)
             node.lastpos.add(node.id)
@@ -155,7 +156,9 @@ def construirArbolSintactico(postfix: str) -> Node:
         final_node = stack[0]
         return final_node
     else:
-        print('arbol sintactico construido incorrectamente')
+        print(f'arbol sintactico construido incorrectamente, elementos en stack: {len(stack)}')
+        for idx, node in enumerate(stack):
+            print(f"Stack[{idx}]: {node.value}")
         return None
         
 
