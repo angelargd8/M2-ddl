@@ -28,6 +28,11 @@ def formatRegEx(regex):
     
     #eliminar los espacios en blanco
     regex = regex.replace(" ", "")  
+
+    #si regex empieza con un operador binario, agregar episolon al inicio
+    if Metachar(regex[0]).IsBinaryOperator():
+        regex = "ε" + regex
+
     stack_temp = []
     i = 0
 

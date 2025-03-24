@@ -12,6 +12,10 @@ class TestRegex(unittest.TestCase):
         self.assertEqual(infixToPostfix("(a|b)+"), "ab|ab|*.#.")
         self.assertEqual(infixToPostfix("(\t|\n)+"), "\t\n|\t\n|*.#.")
         self.assertEqual(infixToPostfix("(a|b)\+"), "ab|\+.#.")
+        self.assertEqual(infixToPostfix("\t|\n"), "\t\n|#.")
+        self.assertEqual(infixToPostfix("|\t|\n"), "ε\t|\n|#.")
+
+
 
 if __name__ == '__main__':
     unittest.main()
