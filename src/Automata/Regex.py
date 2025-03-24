@@ -45,7 +45,6 @@ def formatRegEx(regex):
 
         #manejo de comillas
         if Metachar(c1).IsQuoted():
-            # print("QUOTED ", c1)
             quote_char = c1
             literal = c1
             i += 1

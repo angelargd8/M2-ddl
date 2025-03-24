@@ -56,7 +56,6 @@ def construirArbolSintactico(postfix: str) -> Node:
             i +=2
             continue
 
-    #for i, simbolo in enumerate(postfix):
         #operando (valor o variable)
         if simbolo not in operators:
             # 3
