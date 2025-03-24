@@ -1,18 +1,34 @@
 from Automata.metachar import Metachar
 
+def agregarConcatenacion(tokens):
+    result = []
+
+    for i in range(len(tokens)):
+        c1 = tokens[i]
+        result.append(c1)
+
+        if i + 1 < len(tokens):
+            c2 = tokens[i + 1]
+            if (
+                c1 != "(" and c2 != ")" and 
+                c1 != "|" and c2 != "|" and
+                not Metachar(c2).IsOperator() and
+                not Metachar(c1).IsBinaryOperator() and
+                c2 != "*" and c2 != "+" and c2 != "?"
+                ):
+                result.append(".")
+    return result
+
 
 # funcion para formatear la expresion regular para que se pueda trabajar con ella
 def formatRegEx(regex):
-    
-    #eliminar los espacios en blanco
-    regex = regex.replace(" ", "")
-
     #verificar que no es una expresion vacia
     if not regex: 
-        return "e" #devuelbe epsilon para la expresion vacia
-
+        return "ε" #devuelbe epsilon para la expresion vacia
+    
+    #eliminar los espacios en blanco
+    regex = regex.replace(" ", "")  
     stack_temp = []
-
     i = 0
 
     while i < len(regex):
@@ -20,8 +36,16 @@ def formatRegEx(regex):
 
         #manejo de caracteres de escape
         if c1 == "\\" and i+1 < len(regex):
-            stack_temp.append(c1 + regex[i+1])
-            i += 2
+            c2 = regex[i+1]
+
+            if  Metachar(c2).IsEscaped(): #si el caracter no es un operador
+                stack_temp.append(c1 + c2)
+                i += 2
+                
+            else:
+                #agregar el \, de forma normal
+                stack_temp.append('\\')
+                i += 1
             continue
 
         #manejo de operadores
@@ -32,28 +56,34 @@ def formatRegEx(regex):
             t = stack_temp.pop() #obtener el ultimo valor ingresado
 
             #si es un parentesis tomar todo lo que esta dentro del parentesis
-            if t[0] == ")":
+            if t.startswith(")"):
                 balanceador_i = 0 
                 balanceador_d = 1
-                while balanceador_i!= balanceador_d and stack_temp:
+                grupo = [t]
 
+                while balanceador_i!= balanceador_d and stack_temp:
                     if not stack_temp:
                         raise ValueError("Parentesis no balanceados")
                     
                     top = stack_temp.pop()
+                    grupo.append(top)
 
                     if top == ")":
                         balanceador_d += 1
-                    if top == "(":
+                    elif top == "(":
                         balanceador_i += 1
-                    t.append(top)
-            t.reverse()
-            t = "".join(t)
-            stack_temp.append("(")
-            stack_temp.append("e")
-            stack_temp.append("|")
-            stack_temp.append(t)
-            stack_temp.append(")")
+
+                grupo.reverse()
+                t = "".join(grupo)
+
+            # stack_temp.append("(")
+            # stack_temp.append("e")
+            # stack_temp.append("|")
+            # stack_temp.append(t)
+            # stack_temp.append(")")
+            stack_temp.extend(["(", "ε", "|", t, ")"])
+            i += 1
+            continue
 
         #manejo del operador +
         elif c1 == "+":
@@ -62,61 +92,53 @@ def formatRegEx(regex):
             t = stack_temp.pop()  # obtiene el ultimo valor ingresado
 
             #si no es un valor unico, si no algo que esta en parentesis se obtiene todo lo que esta en el parentesis
-            if t[0] == ")":
+            if t.startswith(")"):
                 balanceador_i = 0
                 balanceador_d = 1
+
+                grupo = [t]
+
                 while balanceador_i!= balanceador_d and stack_temp:
 
                     if not stack_temp: #verificar si el stack esta vacio
                         raise ValueError("Parentesis no balanceados")
 
                     top = stack_temp.pop()
+                    grupo.append(top)
                     if top == ")":
                         balanceador_d += 1
                     if top == "(":
                         balanceador_i += 1
-                    t.append(top)
+                    
+                grupo.reverse()
+                t = "".join(grupo)
 
-            t.reverse()
-            t = "".join(t)
-            stack_temp.append(t)
-            stack_temp.append(t)
-            stack_temp.append("*")  # agrega el *
+            # stack_temp.append(t)
+            # stack_temp.append(t)
+            # stack_temp.append("*")  # agrega el *
+            # stack_temp.extend([t, t, "*"])
+            stack_temp.extend(["(", t, t, "*", ")"])
+
+            i += 1
+            continue
         else: 
             stack_temp.append(c1)
+            i += 1
 
-        i += 1
-
-    regex = "".join(stack_temp)
+    # regex = "".join(stack_temp)
 
 
-    if regex and Metachar(regex[-1]).IsBinaryOperator():
-        #agregar epsilon si termina con operador binario
-        regex += "e"
+    # if regex and Metachar(regex[-1]).IsBinaryOperator():
+    #     #agregar epsilon si termina con operador binario
+    #     regex += "e"
 
+    if stack_temp and Metachar(stack_temp[-1]).IsBinaryOperator():
+        stack_temp.append("ε")
 
     #agregar el operador de concatenacion
-
-    result = ""
-
-    for i in range(len(regex)):
-        c1 = regex[i]
-        result += c1
-
-        if i + 1 < len(regex):
-            c2 = regex[i + 1]
-            #insertar '.' cuando sea necesario
-            if (
-                c1 != "(" and c2 != ")" and 
-                c1 != "\\" and c1 != "|" and c2 != "|" and
-                not Metachar(c2).IsOperator() and
-                not Metachar(c1).IsBinaryOperator()
-                ):
-
-                result += "."
-
-    return result
-
+    tokens_concatenados = agregarConcatenacion(stack_temp)
+    regex_result = "".join(tokens_concatenados)
+    return regex_result
 
 
 # fucncion para convertir una expresion regular de notacion infix a postfix
@@ -124,7 +146,7 @@ def formatRegEx(regex):
 def infixToPostfix(regex):
 
     if not regex:
-        return "e" #para el manejo de entrada vacia
+        return "ε" #para el manejo de entrada vacia
 
     postfix = ""
     stack = []
@@ -150,12 +172,24 @@ def infixToPostfix(regex):
         #manejo de caracteres de escape
 
         elif c == "\\" and i + 1 < len(regex):
-            postfix += "\\" + regex[i + 1]
-            i += 1
+            c2 = regex[i + 1]
+            postfix += "\\" + c2
+            i += 2
+            continue
+
+            # if Metachar(c2).IsEscaped():
+            #     postfix += "\\" + c2
+            #     i += 2
+            #     continue
+            # else:
+            #     postfix += "\\" 
+            #     # postfix += c2
+            #     i += 1
+            #     continue
+
 
         #manejo de operadores
-        else:
-            
+        else:           
             while stack: 
                 peekedChar = stack[-1]
 

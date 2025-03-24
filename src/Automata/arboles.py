@@ -164,10 +164,10 @@ def imprimirArbolSintactico(nodo: Node, sangria: str = "", es_ultimo: bool = Tru
     # nodo actual con sangria
     if sangria:
         if es_ultimo:
-            print(sangria + "└─ " + str(nodo.value) + " (" + str(nodo.nullable) +  ") " )# + str(nodo.firstpos))
+            print(sangria + "└─ " + str(nodo.displayValue()) + " (" + str(nodo.nullable) +  ") " )# + str(nodo.firstpos))
             sangria_nueva = sangria + "   "
         else:
-            print(sangria + "├─ " + str(nodo.value) + " (" + str(nodo.nullable) +   ") " )# + str(nodo.firstpos) )
+            print(sangria + "├─ " + str(nodo.displayValue()) + " (" + str(nodo.nullable) +   ") " )# + str(nodo.firstpos) )
             sangria_nueva = sangria + "│  "
     else:
         print(str(nodo.__str__()))
