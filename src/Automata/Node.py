@@ -4,7 +4,6 @@ from Automata.metachar import Metachar
 class Node:
     
     latest_id = 0
-    # tree_graph = Graph(format='png')
 
     def __init__(self, value):
         self.value = value

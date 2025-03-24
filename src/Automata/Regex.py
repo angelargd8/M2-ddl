@@ -76,11 +76,6 @@ def formatRegEx(regex):
                 grupo.reverse()
                 t = "".join(grupo)
 
-            # stack_temp.append("(")
-            # stack_temp.append("e")
-            # stack_temp.append("|")
-            # stack_temp.append(t)
-            # stack_temp.append(")")
             stack_temp.extend(["(", "ε", "|", t, ")"])
             i += 1
             continue
@@ -113,10 +108,6 @@ def formatRegEx(regex):
                 grupo.reverse()
                 t = "".join(grupo)
 
-            # stack_temp.append(t)
-            # stack_temp.append(t)
-            # stack_temp.append("*")  # agrega el *
-            # stack_temp.extend([t, t, "*"])
             stack_temp.extend(["(", t, t, "*", ")"])
 
             i += 1
@@ -125,12 +116,6 @@ def formatRegEx(regex):
             stack_temp.append(c1)
             i += 1
 
-    # regex = "".join(stack_temp)
-
-
-    # if regex and Metachar(regex[-1]).IsBinaryOperator():
-    #     #agregar epsilon si termina con operador binario
-    #     regex += "e"
 
     if stack_temp and Metachar(stack_temp[-1]).IsBinaryOperator():
         stack_temp.append("ε")
@@ -176,17 +161,6 @@ def infixToPostfix(regex):
             postfix += "\\" + c2
             i += 2
             continue
-
-            # if Metachar(c2).IsEscaped():
-            #     postfix += "\\" + c2
-            #     i += 2
-            #     continue
-            # else:
-            #     postfix += "\\" 
-            #     # postfix += c2
-            #     i += 1
-            #     continue
-
 
         #manejo de operadores
         else:           

@@ -5,7 +5,7 @@ class Metachar:
 
         self.value = value
 
-        self.is_escaped = False#isinstance(value, str) and len(value) > 1 and value[0] == '\\'
+        self.is_escaped = False
 
     #funcion para determinar el orden de las operaciones de una expresion regular
     def getPrecedence(self, operator):
