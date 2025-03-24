@@ -25,6 +25,24 @@ def construirArbolSintactico(postfix: str) -> Node:
         simbolo = postfix[i]
         print('procesando simbolo: ' + simbolo)
 
+        #manejar literales entre comillas
+        if simbolo in {"'", '"'}:
+            quote_char = simbolo
+            literal = simbolo
+            i += 1
+            while i < len(postfix):
+                literal += postfix[i]
+                if postfix[i] == quote_char:
+                    break
+                i += 1
+            node = Node(literal)
+            node.firstpos.add(node.id)
+            node.lastpos.add(node.id)
+            node.nullable = False
+            stack.append(node)
+            i += 1
+            continue
+
         #manejar simbolos escapados
         if simbolo == "\\" and i + 1 < len(postfix):
             #tratar el simbolo escapado como una unidad

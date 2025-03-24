@@ -14,6 +14,8 @@ class TestRegex(unittest.TestCase):
         self.assertEqual(infixToPostfix("(a|b)\+"), "ab|\+.#.")
         self.assertEqual(infixToPostfix("\t|\n"), "\t\n|#.")
         self.assertEqual(infixToPostfix("|\t|\n"), "ε\t|\n|#.")
+        self.assertEqual(infixToPostfix("' '|\n|\t"), "' '\n|\t|#.")
+
 
 
 

@@ -38,3 +38,9 @@ class Metachar:
         if self.value in {'t', 'n', 'r', 'v', '\\', '0', '|', '?','+','*','^','∗'} :
             return True
         return False
+
+    def IsQuoted(self):
+        # return self.value in {'"', "'"}
+        if self.value in {'"', "'"}:
+            return True
+        return False

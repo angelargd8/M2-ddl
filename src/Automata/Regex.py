@@ -26,8 +26,12 @@ def formatRegEx(regex):
     if not regex: 
         return "ε" #devuelbe epsilon para la expresion vacia
     
-    #eliminar los espacios en blanco
-    regex = regex.replace(" ", "")  
+
+    if Metachar(regex[0]).IsQuoted():
+        pass
+    else:
+        #eliminar los espacios en blanco
+        regex = regex.replace(" ", "")  
 
     #si regex empieza con un operador binario, agregar episolon al inicio
     if Metachar(regex[0]).IsBinaryOperator():
@@ -38,6 +42,21 @@ def formatRegEx(regex):
 
     while i < len(regex):
         c1 = regex[i]
+
+        #manejo de comillas
+        if Metachar(c1).IsQuoted():
+            # print("QUOTED ", c1)
+            quote_char = c1
+            literal = c1
+            i += 1
+            while i < len(regex):
+                literal += regex[i]
+                if regex[i] == quote_char:
+                    break
+                i += 1
+            stack_temp.append(literal)  # agregar el literal completo como un solo token
+            i += 1
+            continue
 
         #manejo de caracteres de escape
         if c1 == "\\" and i+1 < len(regex):
