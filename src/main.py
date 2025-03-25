@@ -22,8 +22,8 @@ stream_handler.setFormatter(formatter)
 
 
 # Add the handlers to the logger
-# logger.addHandler(file_handler)
-# logger.addHandler(stream_handler)
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 
 def construirAFD(postfix):
@@ -36,6 +36,7 @@ def construirAFD(postfix):
 
     else:
         print("Error al construir el arbol sintactico")
+        return None
 
     # # # el followpos es la tablita para saber las posiciones que se tienen que seguir
     followpos = defaultdict(set)
@@ -62,5 +63,8 @@ for i, expresion in enumerate(expresiones):
 
     # Generar la imagen del AFD usando la función de visualización
     # Aquí usamos la expresión regular como parte del nombre, pero se sanitiza internamente.
-    visualize_afd(afd, output_dir="Visual_AFD", file_name=f"AFD_{i}")
-    logger.info(f"Imagen del AFD generada: AFD_{i}")
+    if afd:
+        visualize_afd(afd, output_dir="Visual_AFD", file_name=f"AFD_{i}")
+        logger.info(f"Imagen del AFD generada: AFD_{i}")
+    else:
+        logger.error(f"No se pudo generar el AFD para la expresion {expresion}, porque es None")

@@ -1,7 +1,15 @@
 # visualizador.py
 import os
 from graphviz import Digraph
-import re
+
+def escaped_symbol(symbol):
+    if symbol.startswith("\\"):
+        special_chars = {'t', 'n', 'r', 'v', '\\', '0'}
+        if symbol[1] not in special_chars:
+            return symbol[1]
+        return '\\\\' + symbol[1:]
+    
+    return symbol
 
 
 def visualize_afd(afd, output_dir, file_name):
@@ -35,12 +43,16 @@ def visualize_afd(afd, output_dir, file_name):
     # Agregar las transiciones
     for origen, trans in afd.transiciones.items():
         for symbol, destinos in trans.items():
+
+            #procesar correctamente los caracteres escapados para la visualizacion
+            display_symbol  = escaped_symbol(symbol)
+            
             # Asegurarse de que destinos sea iterable
             if isinstance(destinos, int):  # Si es un solo entero
                 destinos = [destinos]  # Convertirlo en lista
 
             for destino in destinos:
-                graph.edge(str(origen), str(destino), label=symbol)
+                graph.edge(str(origen), str(destino), label=display_symbol)
 
 
     output_path = os.path.join(output_dir, file_name)
