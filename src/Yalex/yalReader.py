@@ -4,11 +4,12 @@ class yalReader:
     def __init__(self, text):
         self.text = text
         self.list = [] # para llevar el orden / es necesario cuidar la precedencia
-        self.dicc = {}  # diccionario para las definiciones
-        self.rules_tokens = []
+        self.dicc = {}  # diccionario para las definiciones y expresiones
+        self.rules_tokens = {}
         self.header = ""
         self.trailer = ""
         self.simbols = "+*|()[]-?'"
+        self.operators = "+*|?"
 
         # self.remove_comments()
         # self.read_yalex()
@@ -58,6 +59,13 @@ class yalReader:
                 else: # significa que hace referencia a otra variable y hay que remplazarla
                     # leemos letra por letra hasta encontrar un simbolo
                     temp = ""
+                    if expresion[i] not in self.simbols:
+                        temp += expresion[i]
+                        i += 1
+                    else:
+                        if expresion[i] == '.':
+                            pass # validacion especial para los puntos
+
                     # se guarda en un temp para evaluar si existe en el diccionario
                     # si existen se remplaza por el valor que ya tenia
                     pass
