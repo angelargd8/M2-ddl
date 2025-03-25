@@ -33,11 +33,18 @@ class yalReader:
                     while cadena:
                         i += 1
                         if expresion[i] == "'": # si empieza con comillas simples cada caracter está en comillas simples y se debe de separar por ellas
-                            new_exp += expresion[i+1]
-                            i += 2
+                            if expresion[i+1] in self.simbols: # esto sirve para validar los simbolos que estan dentro de comillas
+                                new_exp += "\\"+expresion[i + 1]
+                                i += 4
+                                new_exp += "|"
+                            else:
+                                new_exp += expresion[i+1]
+                                i += 2
+
                             while expresion[i] != "'":
                                 new_exp += expresion[i]
                                 i += 1
+
                             if expresion[i+1] == "-": # expresiones que sean de 'a'-'z'
                                 new_exp += "|"
                                 new_exp += self.get_ascii(expresion[i-1], expresion[i+3])
@@ -47,7 +54,10 @@ class yalReader:
                         if expresion[i] == "\"": # si la expresion empieza con " comillas dobles, significa que la separacion es diferente
                             i += 1
                             while expresion[i] != "\"":
-                                new_exp += expresion[i]
+                                if expresion[i] in self.simbols:
+                                    new_exp += "\\"+expresion[i]
+                                else:
+                                    new_exp += expresion[i]
                                 i += 1
                                 if i + 2 < len(expresion):
                                     new_exp += "|"
@@ -120,7 +130,7 @@ class yalReader:
             i += 1  # Avanzar en el código
 
         #print(self.dicc)
-        # return True # para el módulo de pruebas
+        return True # para el módulo de pruebas
 
     # elimina los comentarios del texto
     def remove_comments(self):
@@ -143,6 +153,7 @@ class yalReader:
 
         # sustituye el texto ya sin los comentarios, strip quita los espacios
         self.text = "".join(result).strip()
+        return self.text
 
 
     # regresar el rango de caracteres con ayuda de ascii

@@ -1,6 +1,5 @@
 import unittest
-from Yalex.yalReader import yalReader
-
+from src.Yalex.yalReader import yalReader
 
 code = """(* hola soy un 
 comentario yupi(*
@@ -22,7 +21,8 @@ rule tokens =
 
 (* Introducir cualquier trailer aqui *)
 """
-code2 = """let delim = [' ''\t''\n']
+code2 = """{header}
+let delim = [' ''\t''\n']
 let ws = delim+
 let letter = ['A'-'Z''a'-'z']
 let digit = ['0'-'9']
@@ -40,15 +40,15 @@ yal = yalReader(code)
 
 yal2 = yalReader("[' ''\t''\n']")
 yal2.list.append("delim")
-yal2.dicc = {"delim": "[' ''\t''\n']"}
+yal2.dicc = {"delim": "['+''\t''\n']"}
 
 yal3 = yalReader("['a'-'d']")
 yal3.list.append("delim")
 yal3.dicc = {"delim": "['a'-'d']"}
 
-yal4 = yalReader("[\" \t\n\"]")
+yal4 = yalReader("[\"+\t\n\"]")
 yal4.list.append("delim")
-yal4.dicc = {"delim": "[\" \t\n\"]"}
+yal4.dicc = {"delim": "[\"+\t\n\"]"}
 
 class MyTestCase(unittest.TestCase):
     def test_delete_comments(self):
@@ -58,13 +58,13 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(yal.read_yalex(), True)
 
     def test_parse(self):
-        self.assertEqual(" |\t|\n", yal2.parse())
+        self.assertEqual("\+|\t|\n", yal2.parse())
 
     def test_parse2(self):
         self.assertEqual("a|b|c|d", yal3.parse())
 
     def test_parse3(self):
-        self.assertEqual(" |\t|\n", yal4.parse())
+        self.assertEqual("\+|\t|\n", yal4.parse())
 
     def test_ascci(self):
         self.assertEqual("b|c|d", yal2.get_ascii("a", "d"))
