@@ -50,6 +50,10 @@ yal4 = yalReader("[\"+\t\n\"]")
 yal4.list.append("delim")
 yal4.dicc = {"delim": "[\"+\t\n\"]"}
 
+yal5 = yalReader("[\"+\t\n\"]")
+yal5.list.append("delim, delim2")
+yal5.dicc = {"delim": "['a'-'d']", "delim2": "delim+"}
+
 class MyTestCase(unittest.TestCase):
     def test_delete_comments(self):
         self.assertEqual(yal.remove_comments(), code2)  # add assertion here
@@ -68,6 +72,10 @@ class MyTestCase(unittest.TestCase):
 
     def test_ascci(self):
         self.assertEqual("b|c|d", yal2.get_ascii("a", "d"))
+
+    def test_parse4(self):
+        self.assertEqual("(a|b|c|d)+", yal2.parse())
+
 
 if __name__ == '__main__':
     unittest.main()

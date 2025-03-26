@@ -69,16 +69,20 @@ class yalReader:
                 else: # significa que hace referencia a otra variable y hay que remplazarla
                     # leemos letra por letra hasta encontrar un simbolo
                     temp = ""
-                    if expresion[i] not in self.simbols:
+                    while expresion[i] not in self.simbols and expresion[i] != '.':
                         temp += expresion[i]
                         i += 1
-                    else:
-                        if expresion[i] == '.':
-                            pass # validacion especial para los puntos
+                    if expresion[i] == '.':# validacion especial para los puntos
+                        new_exp += "."
+                        i += 1
+                    if expresion[i] in self.simbols:
+                        new_exp += expresion[i]
+                        i += 1
+                    # aqui deberia de evaluar el temp
+                    new_exp = "("+self.dicc[temp]+")"
 
                     # se guarda en un temp para evaluar si existe en el diccionario
                     # si existen se remplaza por el valor que ya tenia
-                    pass
 
 
             self.dicc[n] = new_exp # se remplaza la expresion ya formateada en regex para su uso mas adelante
