@@ -20,7 +20,6 @@ class yalReader:
         self.read_yalex()
         self.parse()
         self.parse_tokens()
-        print(self.tokens)
 
 
     def get_rules_tokens(self):
@@ -42,7 +41,6 @@ class yalReader:
                 self.tokens[self.rules_tokens[key]] = self.dicc[key]
             else: # si no es regex jalar solo el valor que tiene
                 key = key.strip()
-                print(key)
                 if key[1] in self.simbols:
                     self.tokens[self.rules_tokens[key]] = "\\"+key[1]
                 else:
@@ -86,7 +84,11 @@ class yalReader:
                                 if expresion[i] in self.simbols:
                                     new_exp += "\\"+expresion[i]
                                 else:
-                                    new_exp += expresion[i]
+                                    if expresion[i] == "\\":
+                                        new_exp += expresion[i] + expresion[i+1]
+                                        i += 1
+                                    else:
+                                        new_exp += expresion[i]
                                 i += 1
                                 if i + 2 < len(expresion):
                                     new_exp += "|"
@@ -99,7 +101,10 @@ class yalReader:
                     if expresion[i] in self.simbols :
                         if expresion[i] == "'":
                             i += 1 # me salto la primera '
-                            new_exp += "\\"+expresion[i] # agrego \ y la letra
+                            if expresion[i] in self.simbols:
+                                new_exp += "\\"+expresion[i] # agrego \ y la letra
+                            else:
+                                new_exp +=  expresion[i]
                             i += 2 # me salto la letra y la otra '
                         else:
                             new_exp += expresion[i]
@@ -120,7 +125,6 @@ class yalReader:
 
 
             self.dicc[n] = new_exp # se remplaza la expresion ya formateada en regex para su uso mas adelante
-        print(self.dicc) # mostrar el diccionario para validar
 
 
     # lee el archivo para colocarlo en los diccionarios y
@@ -240,8 +244,7 @@ class yalReader:
 
 
             i += 1  # Avanzar en el código
-        print(self.dicc)
-        print(self.rules_tokens)
+
         return True # para el módulo de pruebas
 
     # elimina los comentarios del texto

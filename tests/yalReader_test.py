@@ -37,6 +37,7 @@ rule tokens =
   | '('       { return LPAREN }
   | ')'       { return RPAREN }"""
 
+# yal = yalReader(code)
 
 
 yal2 = yalReader("[' ''\t''\n']")
@@ -47,16 +48,13 @@ yal3 = yalReader("['a'-'d']")
 yal3.list.append("delim")
 yal3.dicc = {"delim": "['a'-'d']"}
 
-yal4 = yalReader("[\"+\t\n\"]")
-yal4.list.append("delim")
-yal4.dicc = {"delim": "[\"+\t\n\"]"}
+
 
 yal5 = yalReader("[\"+\t\n\"]")
 yal5.list.append("delim")
 yal5.list.append("delim2")
 yal5.dicc = {"delim": "['a'-'d']", "delim2": "delim+['a']"}
 
-yal = yalReader(code)
 
 class MyTestCase(unittest.TestCase):
     def test_delete_comments(self):
@@ -66,13 +64,16 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(yalReader(code), True)
 
     def test_parse(self):
-        self.assertEqual("\+|\t|\n", yal2.parse())
+        self.assertEqual(" |\t|\n", yal2.parse())
 
     def test_parse2(self):
         self.assertEqual("a|b|c|d", yal3.parse())
 
     def test_parse3(self):
-        self.assertEqual("\+|\t|\n", yal4.parse())
+        yal4 = yalReader("[\"\s\t\n\"]")
+        yal4.list.append("delim")
+        yal4.dicc = {"delim": "[\"\s\t\n\"]"}
+        self.assertEqual("\s|\t|\n", yal4.parse())
 
     def test_ascci(self):
         self.assertEqual("b|c|d", yal2.get_ascii("a", "d"))

@@ -6,65 +6,33 @@ from Automata.Node import *
 from collections import defaultdict
 from Automata.graficadora import visualize_afd
 import logging
+from Yalex.yalReader import yalReader
+import os
 
-# Create a logger
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+import os
 
-# Create a file handler and a stream handlerh
-file_handler = logging.FileHandler("afd_generation.log")
-stream_handler = logging.StreamHandler()
-
-# Create a formatter and add it to the handlers
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-file_handler.setFormatter(formatter)
-stream_handler.setFormatter(formatter)
-
-
-# Add the handlers to the logger
-logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
-
-
-def construirAFD(postfix):
-    # construir el arbol sintactico para la cadena
-    ArbolSintactico = construirArbolSintactico(postfix)
-
-    if ArbolSintactico:
-        print("arbol construido correctamente")
-        imprimirArbolSintactico(ArbolSintactico, "", True)
-
-    else:
-        print("Error al construir el arbol sintactico")
+def leerArchivo(ruta):
+    try:
+        with open(ruta, "r", encoding="utf-8") as archivo:
+            return archivo.read()
+    except Exception as e:
+        print(f"Error al leer {ruta}: {e}")
         return None
 
-    # # # el followpos es la tablita para saber las posiciones que se tienen que seguir
-    followpos = defaultdict(set)
-    calcular_followPos(ArbolSintactico, followpos)
-
-    # # # construir el AFD
-    afd = construir_AFD(ArbolSintactico, followpos)
-
-    return afd
+# Lista de archivos con extensión .yal en la carpeta yalDocs
+# archivos = ["slr-1.yal", "slr-2.yal", "slr-3.yal", "slr-4.yal"]  # Asegúrate de que los nombres sean correctos
+archivos = ["slr-4.yal"]  # Asegúrate de que los nombres sean correctos
 
 
-expresiones = leerArchivo("../expresiones.txt")
+for i in archivos:
+    ruta = os.path.join("Yalex/yalDocs", i)  # Construye la ruta
+    text = leerArchivo(ruta)
+    if text is not None:
+        print(f"Archivo {i} leido correctamente")
+        # parseamos el doc y obtenemos los tokens
+        yal = yalReader(text)
+        print(yal.get_tokens())
 
-# Procesar cada expresión regular y generar el AFD
-for i, expresion in enumerate(expresiones):
-    logger.info(f"Procesando expresion {i + 1}: {expresion} \n")
-    postfix = infixToPostfix(expresion)
-    print(f"Expresion POSTFIX: {postfix}\n")
 
-    afd = construirAFD(postfix)
 
-    # afd.mostrar()
-    logger.info("AFD mostrado")
 
-    # Generar la imagen del AFD usando la función de visualización
-    # Aquí usamos la expresión regular como parte del nombre, pero se sanitiza internamente.
-    if afd:
-        visualize_afd(afd, output_dir="Visual_AFD", file_name=f"AFD_{i}")
-        logger.info(f"Imagen del AFD generada: AFD_{i}")
-    else:
-        logger.error(f"No se pudo generar el AFD para la expresion {expresion}, porque es None")
