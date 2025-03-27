@@ -64,77 +64,64 @@ def construir_AFD(arbolSintactico, followpos):
     # 1 . instanciar AFD
     afd = AFD()
 
-    # 2. mapear posiciones a simbolos
+    # 1. Mapear posiciones a símbolos
     posicion_a_simbolo = {}
     mapear_posiciones_simbolos(arbolSintactico, posicion_a_simbolo)
 
-    # 3. Obtener el alfabeto sin tomar en cuenta los caracteres especiales y operadores
+    # 2. Alfabeto sin operadores especiales
     alfabeto = set()
-    for pos, simbolo in posicion_a_simbolo.items():
-        if simbolo not in ["*", "+", ".", "|", "#", "^", "ε", "e"]:
+    for simbolo in posicion_a_simbolo.values():
+        if simbolo not in [
+            "*",
+            "+",
+            ".",
+            "|",
+            "#",
+            "^",
+            "ε",
+            "e",
+        ] and not simbolo.startswith("#"):
             alfabeto.add(simbolo)
     afd.alfabeto = alfabeto
 
-    # 4. definir el estado inicial como el conjunto firstpos de la raiz del arbol
+    # 3. Estado inicial: conjunto firstpos de la raíz
     estado_inicial = frozenset(arbolSintactico.firstpos)
-
-    # 5. iniciar diccionario de estados y la  lista de estados del AFD
     estados_dict = {estado_inicial: 0}
-    afd.estados = [0]
+    estado_id_a_conjunto = {0: set(estado_inicial)}
+    afd.estados.add(0)
     afd.estado_inicial = 0
 
-    # 6. iniciar la lista de estados no marcados, estos son los que estan pendientes de procesar
     no_marcados = [estado_inicial]
+    id_counter = 1
 
-    # 7. encontrar la posicion del simbolo # (fin de la cadena)
-    posicion_fin = None
-    for pos, simbolo in posicion_a_simbolo.items():
-        if simbolo == "#":
-            posicion_fin = pos
-            break
-
-    # 8. procesar los estados no marcados
+    # 4. Buscar la posición del símbolo final '#' (aunque no es necesario si usamos etiquetas como #num)
     while no_marcados:
-        # 8.1 sacar el estado no marcado
         estado_actual = no_marcados.pop(0)
-        id_estado_actual = estados_dict[estado_actual]
+        id_actual = estados_dict[estado_actual]
 
-        # 8.2  recorrer cada simbolo del alfabeto
-        for simbolo in alfabeto:
-            # encontrar todas las posiciones que tienen este simbolo
-            posiciones_simbolo = set()
-            for pos in estado_actual:
-                if pos in posicion_a_simbolo and posicion_a_simbolo[pos] == simbolo:
-                    posiciones_simbolo.add(pos)
+        for simbolo in afd.alfabeto:
+            posiciones_simbolo = {
+                pos for pos in estado_actual if posicion_a_simbolo.get(pos) == simbolo
+            }
 
-            # 8.3. si hay posiciones con el simbolo, caulcular el nuevo estado segun el followpos
             if posiciones_simbolo:
                 nuevo_estado = set()
-                # recorrer las posiciones del simbolo
                 for pos in posiciones_simbolo:
-                    if pos in followpos:
-                        nuevo_estado.update(followpos[pos])
+                    nuevo_estado.update(followpos[pos])
+                nuevo_estado_frozen = frozenset(nuevo_estado)
 
-                nuevo_estado = frozenset(nuevo_estado)
+                if nuevo_estado_frozen not in estados_dict:
+                    estados_dict[nuevo_estado_frozen] = id_counter
+                    estado_id_a_conjunto[id_counter] = nuevo_estado
+                    afd.estados.add(id_counter)
+                    no_marcados.append(nuevo_estado_frozen)
+                    id_counter += 1
 
-                # 8.4 si es un nuevo estado, añadirlo
-                if nuevo_estado and nuevo_estado not in estados_dict:
-                    estados_dict[nuevo_estado] = len(afd.estados)
-                    afd.estados.append(len(afd.estados))
-                    no_marcados.append(nuevo_estado)
+                afd.agregar_transiciones(
+                    id_actual, simbolo, estados_dict[nuevo_estado_frozen]
+                )
 
-                # 8.5 añadir la transicion
-                if nuevo_estado:
-                    afd.agregar_transiciones(
-                        id_estado_actual, simbolo, estados_dict[nuevo_estado]
-                    )
-
-        # 9. marcar el estado como final si el estado tiene la posicion de #, xq es estado final
-        if posicion_fin in estado_actual:
-            afd.agregar_estado_final(id_estado_actual)
-
-    return afd
-    # return minimizar_AFD(afd)
+    return afd, estados_dict, estado_id_a_conjunto
 
 
 def minimizar_AFD(afd):

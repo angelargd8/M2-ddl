@@ -35,10 +35,15 @@ class LexicalAutomata:
 
 
 def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
-    """Genera un AFD unificado a partir de múltiples tokens."""
     expresiones = []
-    for nombre_token, expresion in tokens.items():
-        expresiones.append(f"({expresion})#{nombre_token}")
+    posicion_a_token = {}
+    token_map = {}
+
+    # Generar expresiones con finalizador único (#idx)
+    for idx, (nombre_token, expresion) in enumerate(tokens.items()):
+        marcador = f"#{idx}"
+        expresiones.append(f"({expresion}){marcador}")
+        token_map[marcador] = nombre_token
 
     expresion_global = "|".join(expresiones)
     logger.info(f"Expresión global: {expresion_global}")
@@ -50,14 +55,26 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     followpos = defaultdict(set)
     calcular_followPos(arbol, followpos)
 
-    afd = construir_AFD(arbol, followpos)
+    from Automata.AFD import mapear_posiciones_simbolos
 
+    posicion_a_simbolo = {}
+    mapear_posiciones_simbolos(arbol, posicion_a_simbolo)
+
+    # Detectar la posición del símbolo '#' y vincularlo al token real
+    for pos, simbolo in posicion_a_simbolo.items():
+        if simbolo.startswith("#"):
+            if simbolo in token_map:
+                posicion_a_token[pos] = token_map[simbolo]
+
+    afd, estados_dict, estado_id_a_conjunto = construir_AFD(arbol, followpos)
+
+    # Marcar estados finales con token
     estado_a_token = {}
-    for estado in afd.estados_finales:
-        for trans in afd.transiciones.get(estado, {}).items():
-            simbolo = trans[0]
-            if isinstance(simbolo, str) and simbolo.startswith("#"):
-                estado_a_token[estado] = simbolo[1:]
+    for estado_id, conjunto_pos in estado_id_a_conjunto.items():
+        for pos in conjunto_pos:
+            if pos in posicion_a_token:
+                estado_a_token[estado_id] = posicion_a_token[pos]
+                afd.agregar_estado_final(estado_id)
 
     afd.mostrar()
     visualize_afd(afd, output_dir=OUTPUT_DIR, file_name="AFD_Unificado")
