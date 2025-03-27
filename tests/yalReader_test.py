@@ -4,21 +4,22 @@ from src.Yalex.yalReader import yalReader
 code = """(* hola soy un 
 comentario yupi(*
 *)
-{header}
+{este es un header}
 let delim = [' ''\t''\n']
 let ws = delim+
 let letter = ['A'-'D']
 let digit = ['0'-'9']
-let id = letter(letter|digit)*
+let id = letter('.'letter|digit)*
 
 rule tokens = 
-    ws
+    ws        { return WHITESPACE }  
   | id        { return ID }               (* Cambie por una acción válida, que devuelva el token *)
   | '+'       { return PLUS }
   | '*'       { return TIMES }
   | '('       { return LPAREN }
   | ')'       { return RPAREN }
 
+{trailerrrr}
 (* Introducir cualquier trailer aqui *)
 """
 code2 = """{header}

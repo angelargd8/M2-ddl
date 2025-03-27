@@ -1,3 +1,5 @@
+from main import expresion
+
 
 # parseo del yalex
 class yalReader:
@@ -9,15 +11,7 @@ class yalReader:
         self.header = ""
         self.trailer = ""
         self.simbols = "+*|()[]-?'"
-        self.operators = "+*|?()"
-
-        # self.remove_comments()
-        # self.read_yalex()
-        # self.parse()
-
-    # recolectar el header y trailer y guardarlos
-    def header_trailer(self):
-        pass
+        self.operators = "+*|?().#"
 
 
     # en el caso de expresiones como [a-z] nos apoyamos del orden ascii y de las funciones de ord y chr
@@ -28,13 +22,12 @@ class yalReader:
             i = 0
             new_exp = ""
             while i < len(expresion):
-
                 if expresion[i] == "[": # significa que es una expresión regular y hay que parsearla
                     cadena = True
                     while cadena:
                         i += 1
                         if expresion[i] == "'": # si empieza con comillas simples cada caracter está en comillas simples y se debe de separar por ellas
-                            if expresion[i+1] in self.simbols: # esto sirve para validar los simbolos que estan dentro de comillas
+                            if expresion[i+1] in self.simbols: # esto sirve para validar los simbolos que están dentro de comillas
                                 new_exp += "\\"+expresion[i + 1]
                                 i += 4
                                 new_exp += "|"
@@ -69,10 +62,17 @@ class yalReader:
 
                 else: # significa que hace referencia a otra variable y hay que remplazarla
                     if expresion[i] in self.simbols :
-                        new_exp += expresion[i]
-                        i += 1
+                        if expresion[i] == "'":
+                            i += 1 # me salto la primera '
+                            new_exp += "\\"+expresion[i] # agrego \ y la letra
+                            i += 2 # me salto la letra y la otra '
+                        else:
+                            new_exp += expresion[i]
+                            i += 1
                     else:
                     # leemos letra por letra hasta encontrar un simbolo
+                        # se guarda en un temp para evaluar si existe en el diccionario
+                        # si existen se remplaza por el valor que ya tenia
                         temp = ""
                         while expresion[i] not in self.simbols and expresion[i] != '.':
                             temp += expresion[i]
@@ -81,20 +81,22 @@ class yalReader:
                         if expresion[i] in self.operators :
                             new_exp += expresion[i]
                         i += 1
-                        # aqui deberia de evaluar el temp
 
-                        # se guarda en un temp para evaluar si existe en el diccionario
-                        # si existen se remplaza por el valor que ya tenia
 
 
             self.dicc[n] = new_exp # se remplaza la expresion ya formateada en regex para su uso mas adelante
-        print(self.dicc)
+        print(self.dicc) # mostrar el diccionario para validar
 
 
     # lee el archivo para colocarlo en los diccionarios y
     def read_yalex(self):
+        self.remove_comments()
         i = 0
-        while i < len(self.text):
+        inside_rules = False
+        is_header = True
+        length = len(self.text)
+
+        while i < length:
             if self.text[i:i + 4] == "let ":
                 i += 4  # Avanzamos después de "let "
 
@@ -130,16 +132,88 @@ class yalReader:
                 self.list.append(nombre.strip()) # agrega el nombre a la lista para saber el orden en el que aparecieron
                 self.dicc[nombre.strip()] = valor.strip() # agrega el nombre y expresión al diccionario
 
+
+            # headers
+            if self.text[i] == "{" and not inside_rules:
+                i += 1 # saltarse {
+                temp = ""
+                while i < length and self.text[i] != "}":
+                    temp += self.text[i]
+                    i += 1
+                if is_header:
+                    self.header += temp
+                else:
+                    self.trailer += temp
+                is_header = False
+                i += 1 # saltarse }
+
             # rules tokens
-            if self.text[i:i + 4] == "rule":
-                pass
+            # Detectar inicio de rule tokens
+            if self.text[i:i + 13] == "rule tokens =":
+                inside_rules = True
+                i += 13
+
+            if inside_rules:
+
+                while i < length and self.text[i].isspace():
+                    i += 1
+                # Reconocer el primero
+
+                # Leer patrón del token
+                if self.text[i] == '|':
+                    i += 1
+
+                while i < length and self.text[i].isspace():
+                    i += 1
+
+                pattern = ""
+                while i < length and self.text[i] not in "{\n":
+                    pattern += self.text[i]
+                    i += 1
+                pattern = pattern.strip()
+
+                # Leer nombre del token
+                token_name = ""
+                while i < length and self.text[i] != '{':
+                    i += 1
+                i += 1  # Saltar '{'
+
+                while i < length and self.text[i].isspace():
+                    i += 1
+
+                if self.text[i:i + 6] == "return":
+                    i += 6
+                    while i < length and self.text[i].isspace():
+                        i += 1
+
+                    while i < length and self.text[i] != '}':
+                        token_name += self.text[i]
+                        i += 1
+                    i += 1
+                token_name = token_name.strip()
+                if pattern and token_name:
+                    self.rules_tokens[pattern] = token_name
+
+                if i < length:
+                    while self.text[i].isspace():
+                        i += 1
+
+                    if self.text[i] != "|": # si lo siguiente que encuentra ya no es un or despues
+                        inside_rules = False
+                        if self.text[i]== "{":
+                            i -= 1
+
+
             i += 1  # Avanzar en el código
 
-        print(self.dicc)
-        print(self.list)
-        self.parse()
-        print(self.dicc)
-        print(self.list)
+        # print(self.dicc)
+        # print(self.list)
+        # print(self.rules_tokens)
+        # self.parse()
+        # print(self.dicc)
+        # print(self.list)
+        # print(self.header)
+        # print(self.trailer)
         return True # para el módulo de pruebas
 
     # elimina los comentarios del texto
@@ -170,9 +244,3 @@ class yalReader:
     # regresa toda la expresión a excepción del primero
     def get_ascii(self, inicio, fin)-> str:
         return '|'.join(chr(i) for i in range(ord(inicio) + 1, ord(fin) + 1))
-
-
-
-
-
-
