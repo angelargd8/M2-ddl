@@ -48,7 +48,7 @@ class yalReader:
                             if expresion[i+1] == "-": # expresiones que sean de 'a'-'z'
                                 new_exp += "|"
                                 new_exp += self.get_ascii(expresion[i-1], expresion[i+3])
-                                i += 5 # se salta hasta la siguiente expresion porque ya validó el rango
+                                i += 4 # se salta hasta la siguiente expresion porque ya validó el rango
                             if i+2 < len(expresion):
                                 new_exp += "|"
                         if expresion[i] == "\"": # si la expresion empieza con " comillas dobles, significa que la separacion es diferente
@@ -72,21 +72,21 @@ class yalReader:
                     while expresion[i] not in self.simbols and expresion[i] != '.':
                         temp += expresion[i]
                         i += 1
-                    if expresion[i] == '.':# validacion especial para los puntos
-                        new_exp += "."
-                        i += 1
-                    if expresion[i] in self.simbols:
+                    if expresion[i] in self.operators:
+                        new_exp += "(" + self.dicc[temp] + ")"
                         new_exp += expresion[i]
-                        i += 1
+                    else:
+                        new_exp += self.dicc[temp]
+                    i += 1
                     # aqui deberia de evaluar el temp
-                    new_exp = "("+self.dicc[temp]+")"
 
                     # se guarda en un temp para evaluar si existe en el diccionario
                     # si existen se remplaza por el valor que ya tenia
 
 
             self.dicc[n] = new_exp # se remplaza la expresion ya formateada en regex para su uso mas adelante
-            return new_exp
+        print(self.dicc)
+        return self.dicc["delim2"]
 
 
     # lee el archivo para colocarlo en los diccionarios y
@@ -133,7 +133,11 @@ class yalReader:
                 pass
             i += 1  # Avanzar en el código
 
-        #print(self.dicc)
+        print(self.dicc)
+        print(self.list)
+        self.parse()
+        print(self.dicc)
+        print(self.list)
         return True # para el módulo de pruebas
 
     # elimina los comentarios del texto

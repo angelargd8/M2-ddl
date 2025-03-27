@@ -51,8 +51,9 @@ yal4.list.append("delim")
 yal4.dicc = {"delim": "[\"+\t\n\"]"}
 
 yal5 = yalReader("[\"+\t\n\"]")
-yal5.list.append("delim, delim2")
-yal5.dicc = {"delim": "['a'-'d']", "delim2": "delim+"}
+yal5.list.append("delim")
+yal5.list.append("delim2")
+yal5.dicc = {"delim": "['a'-'d']", "delim2": "delim+['a']"}
 
 class MyTestCase(unittest.TestCase):
     def test_delete_comments(self):
@@ -74,7 +75,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual("b|c|d", yal2.get_ascii("a", "d"))
 
     def test_parse4(self):
-        self.assertEqual("(a|b|c|d)+", yal2.parse())
+        self.assertEqual("(a|b|c|d)+a", yal5.parse())
 
 
 if __name__ == '__main__':
