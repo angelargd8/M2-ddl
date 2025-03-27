@@ -1,3 +1,4 @@
+import pickle
 import sys
 import os
 
@@ -5,12 +6,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 from collections import defaultdict
+from typing import Dict, List
+from dataclasses import dataclass
 from Automata.arboles import construirArbolSintactico
 from Automata.Regex import infixToPostfix
-from Automata.AFD import construir_AFD
+from Automata.AFD import AFD, construir_AFD
 from Automata.Node import calcular_followPos
 from Automata.graficadora import visualize_afd
-from Automata.AFN import Afn
 import logging
 
 # Configurar logging
@@ -21,103 +23,87 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-# Carpeta para almacenar los AFDs generados
-OUTPUT_DIR = "generatorAFDS"
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+# Carpeta de salida
+OUTPUT_DIR = "./src/Yalex/generatorAFDS"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-def generar_afds(tokens):
-    """
-    Genera un AFD para cada expresión regular en el diccionario tokens y los grafica.
-    """
-    afds = {}
+@dataclass
+class LexicalAutomata:
+    afd: AFD
+    estado_a_token: Dict[int, str]
 
+
+def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
+    """Genera un AFD unificado a partir de múltiples tokens."""
+    expresiones = []
     for nombre_token, expresion in tokens.items():
-        logger.info(f"Generando AFD para el token: {nombre_token}")
+        expresiones.append(f"({expresion})#{nombre_token}")
 
-        # Convertir la expresión a notación postfix
-        postfix = infixToPostfix(expresion)
-        logger.info(f"Expresión POSTFIX para {nombre_token}: {postfix}")
+    expresion_global = "|".join(expresiones)
+    logger.info(f"Expresión global: {expresion_global}")
 
-        # Construir el árbol sintáctico
-        arbolSintactico = construirArbolSintactico(postfix)
-        if not arbolSintactico:
-            logger.error(f"Error al construir el árbol sintáctico para {nombre_token}")
-            continue
+    postfix = infixToPostfix(expresion_global)
+    logger.info(f"POSTFIX global: {postfix}")
 
-        # Calcular followpos
-        followpos = defaultdict(set)
-        calcular_followPos(arbolSintactico, followpos)
+    arbol = construirArbolSintactico(postfix)
+    followpos = defaultdict(set)
+    calcular_followPos(arbol, followpos)
 
-        # Construir el AFD
-        afd = construir_AFD(arbolSintactico, followpos)
-        afds[nombre_token] = afd
+    afd = construir_AFD(arbol, followpos)
 
-        # Graficar el AFD en la carpeta generatorAFDS
-        visualize_afd(afd, output_dir=OUTPUT_DIR, file_name=f"AFD_{nombre_token}")
-        logger.info(f"Imagen del AFD generada en {OUTPUT_DIR}/AFD_{nombre_token}.png")
+    estado_a_token = {}
+    for estado in afd.estados_finales:
+        for trans in afd.transiciones.get(estado, {}).items():
+            simbolo = trans[0]
+            if isinstance(simbolo, str) and simbolo.startswith("#"):
+                estado_a_token[estado] = simbolo[1:]
 
-    return afds
+    afd.mostrar()
+    visualize_afd(afd, output_dir=OUTPUT_DIR, file_name="AFD_Unificado")
 
-
-def construir_afn_desde_afds(afds):
-    """
-    Construye un AFN con transiciones épsilon hacia cada AFD generado.
-    """
-    afn = Afn()
-
-    estado_inicial = afn.crearNodo()
-    afn.inicio = estado_inicial
-
-    for nombre_token, afd in afds.items():
-        nodo_afn = afn.crearNodo()
-        estado_inicial.hijos.append(("ε", nodo_afn))
-        nodo_afn.hijos.append(("ε", afd.estado_inicial))
-
-        for estado_final in afd.estados_finales:
-            estado_final.hijos.append(("ε", afn.final))
-
-    return afn
+    return LexicalAutomata(afd=afd, estado_a_token=estado_a_token)
 
 
-def analizar_texto_con_afn(afn, texto):
-    """
-    Analiza un texto de entrada y devuelve los tokens reconocidos con sus valores.
-    """
-    tokens_identificados = []
-    i = 0
-    while i < len(texto):
-        estado_actual = afn.inicio
-        token_actual = ""
-        mejor_token = None
-        mejor_match = ""
+def _serialize_automata(automata: LexicalAutomata, output_name: str):
+    new_dir = os.path.join(OUTPUT_DIR, output_name)
+    os.makedirs(new_dir, exist_ok=True)
+    pickle_file_path = os.path.join(new_dir, "lexicalAutomata.pkl")
+    with open(pickle_file_path, "wb") as f:
+        pickle.dump(automata, f)
+    logger.info(f"Automata serializado en {pickle_file_path}")
 
-        for j in range(i, len(texto)):
-            token_actual += texto[j]
 
-            for transicion, siguiente_estado in estado_actual.hijos:
-                if transicion == "ε" or (
-                    token_actual and token_actual[-1] == transicion
-                ):
-                    estado_actual = siguiente_estado
+def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
+    resultados = []
+    palabras = texto.split()
+    for palabra in palabras:
+        estado_actual = automata.afd.estado_inicial
+        for c in palabra:
+            if c in automata.afd.transiciones[estado_actual]:
+                estado_actual = automata.afd.transiciones[estado_actual][c]
+            else:
+                estado_actual = None
+                break
 
-                    if estado_actual in afn.final:
-                        mejor_token = estado_actual
-                        mejor_match = token_actual
-
-        if mejor_token:
-            tokens_identificados.append((mejor_token.nombre, mejor_match))
-            i += len(mejor_match)
+        if estado_actual in automata.afd.estados_finales:
+            token = automata.estado_a_token.get(estado_actual, "UNKNOWN")
+            resultados.append([palabra, token])
         else:
-            i += 1  # Avanzar en caso de no encontrar coincidencia
+            resultados.append([palabra, "ERROR"])
+    return resultados
 
-    return tokens_identificados
 
-
+# Ejemplo de tokens
 tokens = {
-    "id": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|0|1|2|3|4|5|6|7|8|9))*",
     "cond": "if",
     "num": "(0|1|2|3|4|5|6|7|8|9)+",
 }
-construir_afn_desde_afds(generar_afds(tokens=tokens))
+
+lexical_automata = generar_afd_unificado(tokens)
+_serialize_automata(lexical_automata, "lexical_out")
+
+# Simular texto
+test_input = "if 3 if 477"
+resultado = simular_texto(test_input, lexical_automata)
+print(resultado)

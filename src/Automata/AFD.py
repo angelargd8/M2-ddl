@@ -1,21 +1,24 @@
 from collections import deque, defaultdict
+from typing import Dict, Set
 
 
 class AFD:
     def __init__(self):
-        self.estados = []
-        self.alfabeto = set()
-        self.estado_inicial = None
-        self.estados_finales = set()
-        self.transiciones = defaultdict(dict)
+        self.estados: Set[int] = set()
+        self.alfabeto: Set[str] = set()
+        self.estado_inicial: int = None
+        self.estados_finales: Set[int] = set()
+        self.transiciones: Dict[int, Dict[str, int]] = defaultdict(dict)
 
-    def agregar_transiciones(self, estado_origen, simbolo, estado_destino):
+    def agregar_transiciones(
+        self, estado_origen: int, simbolo: str, estado_destino: int
+    ):
         self.transiciones[estado_origen][simbolo] = estado_destino
 
-    def agregar_estado_inicial(self, estado):
+    def agregar_estado_inicial(self, estado: int):
         self.estado_inicial = estado
 
-    def agregar_estado_final(self, estado):
+    def agregar_estado_final(self, estado: int):
         self.estados_finales.add(estado)
 
     def mostrar(self):
@@ -24,14 +27,17 @@ class AFD:
         print("Estado inicial:", self.estado_inicial)
         print("Estados finales:", self.estados_finales)
         print("Transiciones:")
-        for estado_origen in self.transiciones:
-            for simbolo in self.transiciones[estado_origen]:
-                estado_destino = self.transiciones[estado_origen][simbolo]
+        for estado_origen, trans in self.transiciones.items():
+            for simbolo, estado_destino in trans.items():
                 print(f"{estado_origen} -> {estado_destino} [simbolo: {simbolo}]")
         print("---" * 15)
 
     def __str__(self):
-        return f"AFD(estados={self.estados}, alfabeto={self.alfabeto}, estado_inicial={self.estado_inicial}, estados_finales={self.estados_finales}, transiciones={self.transiciones})"
+        return (
+            f"AFD(estados={self.estados}, alfabeto={self.alfabeto}, "
+            f"estado_inicial={self.estado_inicial}, estados_finales={self.estados_finales}, "
+            f"transiciones={self.transiciones})"
+        )
 
 
 def mapear_posiciones_simbolos(nodo, posicion_a_simbolo):
