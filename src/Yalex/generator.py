@@ -43,7 +43,7 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     for idx, (nombre_token, expresion) in enumerate(tokens.items()):
         marcador = f"#{idx}"
         expresiones.append(f"({expresion}){marcador}")
-        token_map[marcador] = nombre_token
+        token_map[str(idx)] = nombre_token
 
     expresion_global = "|".join(expresiones)
     logger.info(f"Expresión global: {expresion_global}")
@@ -62,9 +62,11 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
 
     # Detectar la posición del símbolo '#' y vincularlo al token real
     for pos, simbolo in posicion_a_simbolo.items():
-        if simbolo.startswith("#"):
-            if simbolo in token_map:
-                posicion_a_token[pos] = token_map[simbolo]
+        if simbolo == "#":
+            next_pos = pos + 1
+            siguiente_simbolo = posicion_a_simbolo.get(next_pos + 1)
+            if siguiente_simbolo and siguiente_simbolo in token_map:
+                posicion_a_token[pos] = token_map[siguiente_simbolo]
 
     afd, estados_dict, estado_id_a_conjunto = construir_AFD(arbol, followpos)
 
