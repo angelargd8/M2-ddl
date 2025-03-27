@@ -15,6 +15,7 @@ class TestRegex(unittest.TestCase):
         self.assertEqual(infixToPostfix("\t|\n"), "\t\n|#.")
         self.assertEqual(infixToPostfix("|\t|\n"), "ε\t|\n|#.")
         self.assertEqual(infixToPostfix("' '|\n|\t"), "' '\n|\t|#.")
+        self.assertEqual(infixToPostfix("(A)((A|B|C|D)|(0|1|2|3|4|5|6|7|8|9))*"), "A.((AB|C|D|)(01|2|3|4|5|6|7|8|9|)|)* . ")
 
 
 

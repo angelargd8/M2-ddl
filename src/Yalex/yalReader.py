@@ -9,7 +9,7 @@ class yalReader:
         self.header = ""
         self.trailer = ""
         self.simbols = "+*|()[]-?'"
-        self.operators = "+*|?"
+        self.operators = "+*|?()"
 
         # self.remove_comments()
         # self.read_yalex()
@@ -28,6 +28,7 @@ class yalReader:
             i = 0
             new_exp = ""
             while i < len(expresion):
+
                 if expresion[i] == "[": # significa que es una expresión regular y hay que parsearla
                     cadena = True
                     while cadena:
@@ -67,26 +68,27 @@ class yalReader:
                             i += 1
 
                 else: # significa que hace referencia a otra variable y hay que remplazarla
-                    # leemos letra por letra hasta encontrar un simbolo
-                    temp = ""
-                    while expresion[i] not in self.simbols and expresion[i] != '.':
-                        temp += expresion[i]
-                        i += 1
-                    if expresion[i] in self.operators:
-                        new_exp += "(" + self.dicc[temp] + ")"
+                    if expresion[i] in self.simbols :
                         new_exp += expresion[i]
+                        i += 1
                     else:
-                        new_exp += self.dicc[temp]
-                    i += 1
-                    # aqui deberia de evaluar el temp
+                    # leemos letra por letra hasta encontrar un simbolo
+                        temp = ""
+                        while expresion[i] not in self.simbols and expresion[i] != '.':
+                            temp += expresion[i]
+                            i += 1
+                        new_exp += "(" + self.dicc[temp] + ")"
+                        if expresion[i] in self.operators :
+                            new_exp += expresion[i]
+                        i += 1
+                        # aqui deberia de evaluar el temp
 
-                    # se guarda en un temp para evaluar si existe en el diccionario
-                    # si existen se remplaza por el valor que ya tenia
+                        # se guarda en un temp para evaluar si existe en el diccionario
+                        # si existen se remplaza por el valor que ya tenia
 
 
             self.dicc[n] = new_exp # se remplaza la expresion ya formateada en regex para su uso mas adelante
         print(self.dicc)
-        return self.dicc["delim2"]
 
 
     # lee el archivo para colocarlo en los diccionarios y
