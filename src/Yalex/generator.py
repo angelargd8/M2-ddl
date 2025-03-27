@@ -13,6 +13,8 @@ from Automata.Regex import infixToPostfix
 from Automata.AFD import AFD, construir_AFD
 from Automata.Node import calcular_followPos
 from Automata.graficadora import visualize_afd
+from Automata.AFD import mapear_posiciones_simbolos
+
 import logging
 
 # Configurar logging
@@ -55,10 +57,10 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     followpos = defaultdict(set)
     calcular_followPos(arbol, followpos)
 
-    from Automata.AFD import mapear_posiciones_simbolos
-
     posicion_a_simbolo = {}
     mapear_posiciones_simbolos(arbol, posicion_a_simbolo)
+
+    print("posicion a simbolo: ", posicion_a_simbolo)
 
     # Detectar la posición del símbolo '#' y vincularlo al token real
     for pos, simbolo in posicion_a_simbolo.items():
@@ -111,22 +113,3 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
         else:
             resultados.append([palabra, "ERROR"])
     return resultados
-
-
-# Ejemplo de tokens
-tokens = {
-    "cond": "if",
-    "num": "(0|1|2|3|4|5|6|7|8|9)+",
-    "plus": "\\+",
-    "parentesis": "\(",
-    "parentesiscierre": "\)",
-    "por": "\\*"
-}
-
-lexical_automata = generar_afd_unificado(tokens)
-_serialize_automata(lexical_automata, "lexical_out")
-
-# Simular texto
-test_input = "if 3 if 477"
-resultado = simular_texto(test_input, lexical_automata)
-print(resultado)
