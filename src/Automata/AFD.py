@@ -61,9 +61,15 @@ def mapear_posiciones_simbolos(nodo, posicion_a_simbolo):
 
 
 def construir_AFD(arbolSintactico, followpos):
-    # 1 . instanciar AFD
-    afd = AFD()
 
+    if arbolSintactico:
+
+        # 1 . instanciar AFD
+        afd = AFD()
+
+        # 2. mapear posiciones a simbolos
+        posicion_a_simbolo = {}
+        mapear_posiciones_simbolos(arbolSintactico, posicion_a_simbolo)
     # 1. Mapear posiciones a símbolos
     posicion_a_simbolo = {}
     mapear_posiciones_simbolos(arbolSintactico, posicion_a_simbolo)

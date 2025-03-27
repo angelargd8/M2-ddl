@@ -1,10 +1,9 @@
 # from graphviz import Graph
-
+from Automata.metachar import Metachar
 
 class Node:
     
     latest_id = 0
-    # tree_graph = Graph(format='png')
 
     def __init__(self, value):
         self.value = value
@@ -20,18 +19,24 @@ class Node:
 
     # imprimir el arbol en formato grafico
     def printTree(self):
-        # Node.tree_graph.node(str(self.id), self.value)
         if self.left:
-            # Node.tree_graph.edge(str(self.id), str(self.left.id))
             self.left.printTree()
 
         if self.right:
-            # Node.tree_graph.edge(str(self.id), str(self.right.id))
             self.right.printTree()
 
     # renderizr el arbol y guardarlo en un archivo
     def renderTree(self):
         Node.tree_graph.render("arboles", view=True)
+
+    def displayValue(self):
+        if isinstance(self.value, str) and len(self.value) > 1 and self.value.startswith("\\"):
+            # Mantener la notación de escape para caracteres especiales
+            special_chars = {'t', 'n', 'r', 'v', '\\', '0'}
+            if self.value[1] not in special_chars:
+                return self.value[1]  #mostrar el caracter de escape
+        return self.value
+
 
     # esta funcion, nos la dio la IA porque no entontraba un error en el arbol sintactico
     def __str__(self):
@@ -65,11 +70,3 @@ def calcular_followPos(node, followpos):
     for pos in node.firstpos.union(node.lastpos):
         if pos not in followpos:
             followpos[pos] = set()
-
-
-    # if node.value == '*':
-    #     for pos in node.lastpos:
-    #         if pos not in followpos:
-    #             followpos[pos] = set()
-    #         followpos[pos].update(node.firstpos)
-

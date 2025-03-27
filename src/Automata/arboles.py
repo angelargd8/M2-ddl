@@ -19,8 +19,42 @@ def construirArbolSintactico(postfix: str) -> Node:
     print('procesando la expresion postfix: ' + postfix)
 
     # 2
-    for i, simbolo in enumerate(postfix):
+    i = 0 
+
+    while i < len(postfix): 
+        simbolo = postfix[i]
         print('procesando simbolo: ' + simbolo)
+
+        #manejar literales entre comillas
+        if simbolo in {"'", '"'}:
+            quote_char = simbolo
+            literal = simbolo
+            i += 1
+            while i < len(postfix):
+                literal += postfix[i]
+                if postfix[i] == quote_char:
+                    break
+                i += 1
+            node = Node(literal)
+            node.firstpos.add(node.id)
+            node.lastpos.add(node.id)
+            node.nullable = False
+            stack.append(node)
+            i += 1
+            continue
+
+        #manejar simbolos escapados
+        if simbolo == "\\" and i + 1 < len(postfix):
+            #tratar el simbolo escapado como una unidad
+            simbolo_escapado = simbolo + postfix[i + 1]
+            print(f"Encontrado símbolo escapado: {repr(simbolo_escapado)}")
+            node = Node(simbolo_escapado)
+            node.firstpos.add(node.id)
+            node.lastpos.add(node.id)
+            node.nullable = False
+            stack.append(node)
+            i +=2
+            continue
 
         #operando (valor o variable)
         if simbolo not in operators:
@@ -30,8 +64,7 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos.add(node.id)
             node.nullable = False
             stack.append(node)
-            # print('variable')
-            # print(node.__str__())
+            i += 1
             continue
             
 
@@ -41,12 +74,17 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos.add(node.id)
             node.nullable = False
             stack.append(node)
+            i += 1
             continue
 
 
         if simbolo in ["*", "+",  "?"]:
-            node = Node(simbolo)
 
+            #verificar si hay operandos disponibles
+            if not stack:
+                raise ValueError(f"expresion postfix invalida: {postfix}")
+
+            node = Node(simbolo)
             node.left = stack.pop()
             node.right = None
             
@@ -60,6 +98,7 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos = node.left.lastpos.copy()
 
             stack.append(node)
+            i += 1
             continue
 
         if simbolo in [".", "|"]:
@@ -91,6 +130,7 @@ def construirArbolSintactico(postfix: str) -> Node:
                 node.nullable = node.left.nullable or node.right.nullable
 
             stack.append(node)
+            i += 1
             continue
 
         if simbolo =="^":
@@ -106,27 +146,28 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos = node.left.lastpos.copy()
 
             stack.append(node)
+            i += 1
             continue
 
         if simbolo =="e" or simbolo == 'ε':
             node = Node(simbolo)
-            # node.firstpos.add(node.id)
-            # node.lastpos.add(node.id)
             node.nullable = True
             stack.append(node)
+            i += 1
             continue
 
+        #si se llega aca hay un simbolo no reconocido
+        raise ValueError(f"simbolo no reconocido en postfix: {simbolo}")
     
-    # print('stack:')
-    # for i in stack:
-    #     print(i.__str__())
 
     if len(stack) == 1:
         print('arbol sintactico construido correctamente')
         final_node = stack[0]
         return final_node
     else:
-        print('arbol sintactico construido incorrectamente')
+        print(f'arbol sintactico construido incorrectamente, elementos en stack: {len(stack)}')
+        for idx, node in enumerate(stack):
+            print(f"Stack[{idx}]: {node.value}")
         return None
         
 
@@ -140,10 +181,10 @@ def imprimirArbolSintactico(nodo: Node, sangria: str = "", es_ultimo: bool = Tru
     # nodo actual con sangria
     if sangria:
         if es_ultimo:
-            print(sangria + "└─ " + str(nodo.value) + " (" + str(nodo.nullable) +  ") " )# + str(nodo.firstpos))
+            print(sangria + "└─ " + str(nodo.displayValue()) + " (" + str(nodo.nullable) +  ") " )# + str(nodo.firstpos))
             sangria_nueva = sangria + "   "
         else:
-            print(sangria + "├─ " + str(nodo.value) + " (" + str(nodo.nullable) +   ") " )# + str(nodo.firstpos) )
+            print(sangria + "├─ " + str(nodo.displayValue()) + " (" + str(nodo.nullable) +   ") " )# + str(nodo.firstpos) )
             sangria_nueva = sangria + "│  "
     else:
         print(str(nodo.__str__()))
