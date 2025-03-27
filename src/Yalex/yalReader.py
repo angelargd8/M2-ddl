@@ -1,4 +1,3 @@
-from main import expresion
 
 
 # parseo del yalex
@@ -7,11 +6,47 @@ class yalReader:
         self.text = text
         self.list = [] # para llevar el orden / es necesario cuidar la precedencia
         self.dicc = {}  # diccionario para las definiciones y expresiones
+
         self.rules_tokens = {}
+        self.tokens = {}
+
         self.header = ""
         self.trailer = ""
-        self.simbols = "+*|()[]-?'"
-        self.operators = "+*|?().#"
+
+        self.simbols = "+*|()[]-?'#."
+
+        # mandar a llamar funciones
+        self.remove_comments()
+        self.read_yalex()
+        self.parse()
+        self.parse_tokens()
+        print(self.tokens)
+
+
+    def get_rules_tokens(self):
+        return self.rules_tokens
+
+    def get_tokens(self):
+        return self.tokens
+
+    def get_header(self):
+        return self.header
+
+    def get_trailer(self):
+        return self.trailer
+
+    # diccionario de los tokens en regex para generacion posterior de afds
+    def parse_tokens(self):
+        for key in self.rules_tokens:
+            if key in self.dicc: # remplaza los regex ya creados
+                self.tokens[self.rules_tokens[key]] = self.dicc[key]
+            else: # si no es regex jalar solo el valor que tiene
+                key = key.strip()
+                print(key)
+                if key[1] in self.simbols:
+                    self.tokens[self.rules_tokens[key]] = "\\"+key[1]
+                else:
+                    self.tokens[self.rules_tokens[key]] = key[1]
 
 
     # en el caso de expresiones como [a-z] nos apoyamos del orden ascii y de las funciones de ord y chr
@@ -78,7 +113,7 @@ class yalReader:
                             temp += expresion[i]
                             i += 1
                         new_exp += "(" + self.dicc[temp] + ")"
-                        if expresion[i] in self.operators :
+                        if expresion[i] in self.simbols :
                             new_exp += expresion[i]
                         i += 1
 
@@ -205,15 +240,8 @@ class yalReader:
 
 
             i += 1  # Avanzar en el código
-
-        # print(self.dicc)
-        # print(self.list)
-        # print(self.rules_tokens)
-        # self.parse()
-        # print(self.dicc)
-        # print(self.list)
-        # print(self.header)
-        # print(self.trailer)
+        print(self.dicc)
+        print(self.rules_tokens)
         return True # para el módulo de pruebas
 
     # elimina los comentarios del texto

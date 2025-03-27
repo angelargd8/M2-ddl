@@ -37,7 +37,7 @@ rule tokens =
   | '('       { return LPAREN }
   | ')'       { return RPAREN }"""
 
-yal = yalReader(code)
+
 
 yal2 = yalReader("[' ''\t''\n']")
 yal2.list.append("delim")
@@ -56,12 +56,14 @@ yal5.list.append("delim")
 yal5.list.append("delim2")
 yal5.dicc = {"delim": "['a'-'d']", "delim2": "delim+['a']"}
 
+yal = yalReader(code)
+
 class MyTestCase(unittest.TestCase):
     def test_delete_comments(self):
         self.assertEqual(yal.remove_comments(), code2)  # add assertion here
 
     def test_read(self):
-        self.assertEqual(yal.read_yalex(), True)
+        self.assertEqual(yalReader(code), True)
 
     def test_parse(self):
         self.assertEqual("\+|\t|\n", yal2.parse())

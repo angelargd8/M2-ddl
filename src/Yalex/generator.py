@@ -117,6 +117,10 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
 tokens = {
     "cond": "if",
     "num": "(0|1|2|3|4|5|6|7|8|9)+",
+    "plus": "\\+",
+    "parentesis": "\(",
+    "parentesiscierre": "\)",
+    "por": "\\*"
 }
 
 lexical_automata = generar_afd_unificado(tokens)

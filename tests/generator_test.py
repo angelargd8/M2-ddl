@@ -7,7 +7,7 @@ sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src", "Yalex"))
 )
 
-from generator import generar_afds
+from src.Yalex.generator import generar_afds
 
 
 class TestGenerator(unittest.TestCase):
