@@ -157,16 +157,18 @@ tokens = {
     "LT": "<|>",
     "semicolon": ";",
     "EQ": "=",
-    "ws": "\t|\n|' '",
+    "ws": "\t|\n| ",
     "plus": "\\+",
     "por": "\\*",
     "minus": "-",
+    "lparen": "\\(",
+    "rparen": "\\)",
 }
 
 lexical_automata = generar_afd_unificado(tokens)
 _serialize_automata(lexical_automata, "lexical_out")
 
 # Simular texto
-test_input = "\t\n+/if123:=holahola<>;=*-"
+test_input = " + / if 123 := holahola < > ; = * - ( ) "
 resultado = simular_texto(test_input, lexical_automata)
 print(resultado)
