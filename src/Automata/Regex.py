@@ -31,11 +31,6 @@ def formatRegEx(regex):
     if not regex:
         return "ε"  # devuelbe epsilon para la expresion vacia
 
-    if Metachar(regex[0]).IsQuoted():
-        pass
-    else:
-        # eliminar los espacios en blanco
-        regex = regex.replace(" ", "")
 
     # si regex empieza con un operador binario, agregar episolon al inicio
     if Metachar(regex[0]).IsBinaryOperator():
@@ -57,6 +52,7 @@ def formatRegEx(regex):
                 if regex[i] == quote_char:
                     break
                 i += 1
+            
             stack_temp.append(literal)  # agregar el literal completo como un solo token
             i += 1
             continue
@@ -72,6 +68,7 @@ def formatRegEx(regex):
             else:
                 # agregar el \, de forma normal
                 stack_temp.append("\\")
+                print(stack_temp)
                 i += 1
             continue
 
@@ -177,6 +174,7 @@ def infixToPostfix(regex):
             stack.append(c)
         elif c == ")":
             while stack and stack[-1] != "(":
+                # print("\STACK: ". join(stack))
                 postfix += stack.pop()
 
             if not stack or stack[-1] != "(":
