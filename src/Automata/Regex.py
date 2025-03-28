@@ -49,6 +49,7 @@ def formatRegEx(regex):
 
         # manejo de comillas
         if Metachar(c1).IsQuoted():
+            print(c1)
             quote_char = c1
             literal = c1
             i += 1
@@ -57,6 +58,7 @@ def formatRegEx(regex):
                 if regex[i] == quote_char:
                     break
                 i += 1
+            print(literal)
             stack_temp.append(literal)  # agregar el literal completo como un solo token
             i += 1
             continue
@@ -71,7 +73,9 @@ def formatRegEx(regex):
 
             else:
                 # agregar el \, de forma normal
+                print("CARACTER ESCAPADO")
                 stack_temp.append("\\")
+                print(stack_temp)
                 i += 1
             continue
 
@@ -177,6 +181,7 @@ def infixToPostfix(regex):
             stack.append(c)
         elif c == ")":
             while stack and stack[-1] != "(":
+                # print("\STACK: ". join(stack))
                 postfix += stack.pop()
 
             if not stack or stack[-1] != "(":
