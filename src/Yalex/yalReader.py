@@ -41,10 +41,22 @@ class yalReader:
                 self.tokens[self.rules_tokens[key]] = self.dicc[key]
             else: # si no es regex jalar solo el valor que tiene
                 key = key.strip()
-                if key[1] in self.simbols:
-                    self.tokens[self.rules_tokens[key]] = "\\"+key[1]
+                print(key)
+                if key[0] == "\"":
+                    j = 1
+                    temp = ""
+                    while j < len(key) and key[j] != "\"":
+                        if key[j] in self.simbols:
+                            temp += "\\" + key[1]
+                        else:
+                            temp += key[j]
+                        j += 1
+                    self.tokens[self.rules_tokens[key]] = temp
                 else:
-                    self.tokens[self.rules_tokens[key]] = key[1]
+                    if key[1] in self.simbols:
+                        self.tokens[self.rules_tokens[key]] = "\\"+key[1]
+                    else:
+                        self.tokens[self.rules_tokens[key]] = key[1]
 
 
     # en el caso de expresiones como [a-z] nos apoyamos del orden ascii y de las funciones de ord y chr
@@ -57,8 +69,10 @@ class yalReader:
             while i < len(expresion):
                 if expresion[i] == "[": # significa que es una expresión regular y hay que parsearla
                     cadena = True
+                    new_exp += "("
                     while cadena:
                         i += 1
+
                         if expresion[i] == "'": # si empieza con comillas simples cada caracter está en comillas simples y se debe de separar por ellas
                             if expresion[i+1] in self.simbols: # esto sirve para validar los simbolos que están dentro de comillas
                                 new_exp += "\\"+expresion[i + 1]
@@ -95,6 +109,7 @@ class yalReader:
 
                         if expresion[i] == "]": # termina la cadena dentro de []
                             cadena = False
+                            new_exp += ")"
                             i += 1
 
                 else: # significa que hace referencia a otra variable y hay que remplazarla
