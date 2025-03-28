@@ -13,13 +13,15 @@ class yalReader:
         self.header = ""
         self.trailer = ""
 
-        self.simbols = "+*|()[]-?'#."
+        self.simbols = "+*|()[]?'#."
+        self.operators = "+*?"
 
         # mandar a llamar funciones
         self.remove_comments()
         self.read_yalex()
         self.parse()
         self.parse_tokens()
+        print(self.tokens)
 
 
     def get_rules_tokens(self):
@@ -33,6 +35,41 @@ class yalReader:
 
     def get_trailer(self):
         return self.trailer
+
+    def expand_optional(expression: str) -> str:
+        new_exp = ""
+        stack = []  # Pila para rastrear los índices de paréntesis abiertos
+        i = 0
+
+        while i < len(expression):
+            if expression[i] == "?":
+                if stack:
+                    # Último paréntesis abierto
+                    start = stack.pop()
+                    substr = new_exp[start:]  # Extraer contenido desde el paréntesis
+                    new_exp = new_exp[:start] + f"(ε|{substr})"
+                else:
+                    # Si no hay paréntesis, tomar el último carácter como afectado
+                    new_exp = new_exp[:-1] + f"(ε|{new_exp[-1]})"
+                i += 1  # Saltar el '?'
+            elif expression[i] == ")":
+                # Extraer el contenido del grupo
+                start = stack.pop()
+                stack.append(start)  # Guardar de nuevo para posible `?`
+                new_exp += expression[i]
+                i += 1
+            elif expression[i] == "(":
+                # Guardar la posición del paréntesis abierto
+                stack.append(len(new_exp))
+                new_exp += expression[i]
+                i += 1
+            else:
+                new_exp += expression[i]
+                i += 1
+
+        return new_exp
+
+
 
     # diccionario de los tokens en regex para generacion posterior de afds
     def parse_tokens(self):
@@ -67,49 +104,58 @@ class yalReader:
             i = 0
             new_exp = ""
             while i < len(expresion):
+                temps = ""
                 if expresion[i] == "[": # significa que es una expresión regular y hay que parsearla
                     cadena = True
-                    new_exp += "("
+                    # new_exp += "("
                     while cadena:
                         i += 1
 
                         if expresion[i] == "'": # si empieza con comillas simples cada caracter está en comillas simples y se debe de separar por ellas
                             if expresion[i+1] in self.simbols: # esto sirve para validar los simbolos que están dentro de comillas
-                                new_exp += "\\"+expresion[i + 1]
+                                temps += "\\"+expresion[i + 1]
                                 i += 4
-                                new_exp += "|"
+                                temps += "|"
                             else:
-                                new_exp += expresion[i+1]
+                                temps += expresion[i+1]
                                 i += 2
 
                             while expresion[i] != "'":
-                                new_exp += expresion[i]
+                                temps += expresion[i]
                                 i += 1
 
                             if expresion[i+1] == "-": # expresiones que sean de 'a'-'z'
-                                new_exp += "|"
-                                new_exp += self.get_ascii(expresion[i-1], expresion[i+3])
+                                temps2 = self.get_ascii(expresion[i-1], expresion[i+3])
+                                # print("Q!!!!!!! ", temps)
+                                if temps2 != "":
+                                    temps += "|" + temps2
                                 i += 4 # se salta hasta la siguiente expresion porque ya validó el rango
-                            if i+2 < len(expresion):
-                                new_exp += "|"
+                            if i+2 < len(expresion) and expresion[i+1] != "]":
+                                temps += "|"
                         if expresion[i] == "\"": # si la expresion empieza con " comillas dobles, significa que la separacion es diferente
                             i += 1
                             while expresion[i] != "\"":
                                 if expresion[i] in self.simbols:
-                                    new_exp += "\\"+expresion[i]
+                                    temps += "\\"+expresion[i]
                                 else:
                                     if expresion[i] == "\\":
-                                        new_exp += expresion[i] + expresion[i+1]
+                                        temps += expresion[i] + expresion[i+1]
+                                        print("!!!!!!!!"+temps)
                                         i += 1
                                     else:
-                                        new_exp += expresion[i]
+                                        temps += expresion[i]
                                 i += 1
                                 if i + 2 < len(expresion):
-                                    new_exp += "|"
+                                    temps += "|"
 
                         if expresion[i] == "]": # termina la cadena dentro de []
                             cadena = False
-                            new_exp += ")"
+                            # new_exp += ")"
+                            if i+1 < len(expresion) and expresion[i+1] in self.simbols:
+                                new_exp += "(" + temps + ")" + expresion[i+1]
+                                i += 1
+                            else:
+                                new_exp += temps
                             i += 1
 
                 else: # significa que hace referencia a otra variable y hay que remplazarla
@@ -118,6 +164,7 @@ class yalReader:
                             i += 1 # me salto la primera '
                             if expresion[i] in self.simbols:
                                 new_exp += "\\"+expresion[i] # agrego \ y la letra
+                                print("!!!!!!!!!!!!!!!!!!!!!!"+ new_exp)
                             else:
                                 new_exp +=  expresion[i]
                             i += 2 # me salto la letra y la otra '
@@ -138,7 +185,7 @@ class yalReader:
                         i += 1
 
 
-
+            # new_exp = new_exp.replace(".", "\.")
             self.dicc[n] = new_exp # se remplaza la expresion ya formateada en regex para su uso mas adelante
 
 

@@ -11,12 +11,9 @@ import os
 
 
 def leerArchivo(ruta):
-    try:
-        with open(ruta, "r", encoding="utf-8") as archivo:
-            return archivo.read()
-    except Exception as e:
-        print(f"Error al leer {ruta}: {e}")
-        return None
+    with open(ruta, "r", encoding="utf-8") as f:
+        texto = f.read()
+    return texto
 
 
 def guardar_resultado_en_txt(resultados, archivo_salida):
@@ -26,10 +23,10 @@ def guardar_resultado_en_txt(resultados, archivo_salida):
             f.write(f"{palabra} -> {token}\n")
 
 
-archivos = ["slr-4.yal"]  # Lista de archivos YAL
+archivos = ["slr-2.yal"]  # Lista de archivos YAL
 
 for archivo_yal in archivos:
-    ruta = os.path.join("yalDocs", archivo_yal)
+    ruta = os.path.join("Yalex/yalDocs", archivo_yal)
     contenido_yal = leerArchivo(ruta)
 
     if contenido_yal:
@@ -37,6 +34,7 @@ for archivo_yal in archivos:
 
         yal = yalReader(contenido_yal)
         tokens = yal.get_tokens()
+        print(tokens)
 
         print("Tokens detectados:")
         for nombre, expr in tokens.items():
@@ -45,7 +43,7 @@ for archivo_yal in archivos:
         automata_lexico = generar_afd_unificado(tokens)
         _serialize_automata(automata_lexico, "lexical_out")
 
-        texto_prueba = leerArchivo("Yalex/Test.txt")
+        texto_prueba = (leerArchivo("Test.txt"))
         if texto_prueba:
             print("\nContenido de Test.txt:")
             print(texto_prueba)
@@ -58,3 +56,20 @@ for archivo_yal in archivos:
 
             guardar_resultado_en_txt(resultados, "Yalex/Out/TokensRead.txt")
             print("\nResultados guardados en Yalex/Out/TokensRead.txt")
+
+
+tokens = {
+    "WHITESPACE": "( |\t|\n)+",
+    "ID": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|((_))|(0|1|2|3|4|5|6|7|8|9))",
+    "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(ε|(\\.(0|1|2|3|4|5|6|7|8|9)+))(ε|(E(ε|(\\+|-))(0|1|2|3|4|5|6|7|8|9)+))",
+    "SEMICOLON": ";",
+    "ASSIGNOP": ":=",
+    "LT": "<",
+    "EQ": "=",
+    "PLUS": "\\+",
+    "MINUS": "-",
+    "TIMES": "\\*",
+    "DIV": "/",
+    "LPAREN": "\\(",
+    "RPAREN":"\\)",
+}
