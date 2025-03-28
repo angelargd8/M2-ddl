@@ -1,0 +1,13 @@
+  -> ERROR
+  -> ERROR
+  -> ERROR
+  -> ERROR
+if -> ID
+  -> ERROR
+123 -> ID
+  -> ERROR
++ -> PLUS
+  -> ERROR
+* -> TIMES
+
+ -> WHITESPACE

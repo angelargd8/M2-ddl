@@ -43,6 +43,7 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
 
     # Generar expresiones con finalizador único usando @idx@
     for idx, (nombre_token, expresion) in enumerate(tokens.items()):
+        expresion = expresion.replace("\\n", "\n")
         marcador = f"@{idx}@"
         expresiones.append(f"({expresion}){marcador}")
         token_map[str(idx)] = nombre_token

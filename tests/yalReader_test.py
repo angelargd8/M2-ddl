@@ -1,26 +1,25 @@
 import unittest
 from src.Yalex.yalReader import yalReader
 
-code = """(* hola soy un 
-comentario yupi(*
-*)
-{este es un header}
+code = """(* Lexer para Gramática No. 1 - Expresiones aritméticas simples para variables *)
+
+{header}
+
 let delim = [' ''\t''\n']
 let ws = delim+
-let letter = ['A'-'D']
+let letter = ['A'-'Z''a'-'z']
 let digit = ['0'-'9']
-let id = letter('.'letter|digit)*
+let id = letter(.letter|digit)*
 
-rule tokens = 
-    ws        { return WHITESPACE }  
+rule tokens =
+    ws        { return WHITESPACE }
   | id        { return ID }               (* Cambie por una acción válida, que devuelva el token *)
   | '+'       { return PLUS }
   | '*'       { return TIMES }
   | '('       { return LPAREN }
   | ')'       { return RPAREN }
 
-{trailerrrr}
-(* Introducir cualquier trailer aqui *)
+{trailer}
 """
 code2 = """{header}
 let delim = [' ''\t''\n']
