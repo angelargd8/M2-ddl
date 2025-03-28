@@ -35,7 +35,7 @@ class Metachar:
         return self.value
 
     def IsEscaped(self):
-        if self.value in {'t', 'n', 'r', 'v', '\\', '0', '|', '?','+','*','^','∗', '(', ')'} :
+        if self.value in {'t', 'n', 'r', 'v', '\\', '0', '|', '?','+','*','^','∗', '(', ')', 's'} :
             return True
         return False
 
