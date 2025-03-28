@@ -41,9 +41,9 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     posicion_a_token = {}
     token_map = {}
 
-    # Generar expresiones con finalizador único (#idx)
+    # Generar expresiones con finalizador único usando @idx@
     for idx, (nombre_token, expresion) in enumerate(tokens.items()):
-        marcador = f"#{idx}"
+        marcador = f"@{idx}@"
         expresiones.append(f"({expresion}){marcador}")
         token_map[str(idx)] = nombre_token
 
@@ -60,15 +60,32 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     posicion_a_simbolo = {}
     mapear_posiciones_simbolos(arbol, posicion_a_simbolo)
 
-    print("posicion a simbolo: ", posicion_a_simbolo)
+    # Detectar fragmentos @idx@ en la secuencia de símbolos
+    sorted_positions = sorted(posicion_a_simbolo.keys())
+    i = 0
+    while i < len(sorted_positions):
+        pos = sorted_positions[i]
+        simbolo = posicion_a_simbolo[pos]
 
-    # Detectar la posición del símbolo '#' y vincularlo al token real
-    for pos, simbolo in posicion_a_simbolo.items():
-        if simbolo == "#":
-            next_pos = pos + 1
-            siguiente_simbolo = posicion_a_simbolo.get(next_pos + 1)
-            if siguiente_simbolo and siguiente_simbolo in token_map:
-                posicion_a_token[pos] = token_map[siguiente_simbolo]
+        if simbolo == "@":
+            num_str = ""
+            j = i + 1
+            while j < len(sorted_positions):
+                next_pos = sorted_positions[j]
+                next_char = posicion_a_simbolo[next_pos]
+                if next_char.isdigit():
+                    num_str += next_char
+                    j += 1
+                elif next_char == "@":
+                    idx = num_str
+                    if idx in token_map:
+                        # Mapear el primer '@' a su token
+                        posicion_a_token[pos] = token_map[idx]
+                    i = j  # saltar al segundo '@'
+                    break
+                else:
+                    break  # No es un marcador válido
+        i += 1
 
     afd, estados_dict, estado_id_a_conjunto = construir_AFD(arbol, followpos)
 
@@ -80,7 +97,7 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
                 estado_a_token[estado_id] = posicion_a_token[pos]
                 afd.agregar_estado_final(estado_id)
 
-    afd.mostrar()
+    # afd.mostrar()
     visualize_afd(afd, output_dir=OUTPUT_DIR, file_name="AFD_Unificado")
 
     return LexicalAutomata(afd=afd, estado_a_token=estado_a_token)
@@ -97,19 +114,59 @@ def _serialize_automata(automata: LexicalAutomata, output_name: str):
 
 def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
     resultados = []
-    palabras = texto.split()
-    for palabra in palabras:
+    i = 0
+    while i < len(texto):
         estado_actual = automata.afd.estado_inicial
-        for c in palabra:
-            if c in automata.afd.transiciones[estado_actual]:
-                estado_actual = automata.afd.transiciones[estado_actual][c]
+        j = i
+        ultimo_estado_final = None
+        ultima_pos_final = i
+
+        while j < len(texto):
+            c = texto[j]
+            transiciones = automata.afd.transiciones.get(estado_actual, {})
+
+            if c == "+" or c == "(" or c == ")" or c == "*":
+                c = "\\" + c
+            if c in transiciones:
+                estado_actual = transiciones[c]
+                j += 1
+                if estado_actual in automata.afd.estados_finales:
+                    ultimo_estado_final = estado_actual
+                    ultima_pos_final = j
             else:
-                estado_actual = None
                 break
 
-        if estado_actual in automata.afd.estados_finales:
-            token = automata.estado_a_token.get(estado_actual, "UNKNOWN")
-            resultados.append([palabra, token])
+        if ultimo_estado_final is not None:
+            lexema = texto[i:ultima_pos_final]
+            token = automata.estado_a_token.get(ultimo_estado_final, "UNKNOWN")
+            resultados.append([lexema, token])
+            i = ultima_pos_final
         else:
-            resultados.append([palabra, "ERROR"])
+            resultados.append([texto[i], "ERROR"])
+            i += 1
+
     return resultados
+
+
+tokens = {
+    "cond": "if",
+    "num": "(0|1|2|3|4|5|6|7|8|9)+",
+    "raro": ":=",
+    "div": "/",
+    "letter": "(a|b|c|d|e|f|g|h|i|j|k|l|m|p|o|q|r|s|t|u|v|w|x|y|z)+",
+    "LT": "<|>",
+    "semicolon": ";",
+    "EQ": "=",
+    "ws": "\t|\n|' '",
+    "plus": "\\+",
+    "por": "\\*",
+    "minus": "-",
+}
+
+lexical_automata = generar_afd_unificado(tokens)
+_serialize_automata(lexical_automata, "lexical_out")
+
+# Simular texto
+test_input = "\t\n+/if123:=holahola<>;=*-"
+resultado = simular_texto(test_input, lexical_automata)
+print(resultado)
