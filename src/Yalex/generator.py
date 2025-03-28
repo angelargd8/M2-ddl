@@ -146,27 +146,3 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
             i += 1
 
     return resultados
-
-
-tokens = {
-    "cond": "if",
-    "num": "(0|1|2|3|4|5|6|7|8|9)+",
-    "raro": ":=",
-    "div": "/",
-    "letter": "(a|b|c|d|e|f|g|h|i|j|k|l|m|p|o|q|r|s|t|u|v|w|x|y|z)+",
-    "LT": "<|>",
-    "semicolon": ";",
-    "EQ": "=",
-    "ws": "\t|\n|' '",
-    "plus": "\\+",
-    "por": "\\*",
-    "minus": "-",
-}
-
-lexical_automata = generar_afd_unificado(tokens)
-_serialize_automata(lexical_automata, "lexical_out")
-
-# Simular texto
-test_input = "\t\n+/if123:=holahola<>;=*-"
-resultado = simular_texto(test_input, lexical_automata)
-print(resultado)
