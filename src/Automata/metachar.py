@@ -40,7 +40,6 @@ class Metachar:
         return False
 
     def IsQuoted(self):
-        # return self.value in {'"', "'"}
         if self.value in {'"', "'", "`"}:
             return True
         return False

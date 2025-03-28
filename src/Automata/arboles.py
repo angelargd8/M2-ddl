@@ -23,10 +23,10 @@ def construirArbolSintactico(postfix: str) -> Node:
 
     while i < len(postfix): 
         simbolo = postfix[i]
-        print('procesando simbolo: ' + simbolo)
+        # print('procesando simbolo: ' + simbolo)
 
         #manejar literales entre comillas
-        if simbolo in {"'", '"'}:
+        if simbolo in {"'", '"', "`"}:
             quote_char = simbolo
             literal = simbolo
             i += 1
