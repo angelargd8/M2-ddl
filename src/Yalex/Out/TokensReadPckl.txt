@@ -1,0 +1,25 @@
++ -> plus
+  -> ws
+- -> minus
+  -> ws
+* -> por
+  -> ws
+123 -> num
+  -> ws
+abcd -> letter
+  -> ws
+  -> ws
+  -> ws
+  -> ws
+  -> ws
+  -> ws
+
+ -> ws
+
+ -> ws
+
+ -> ws
+
+ -> ws
+
+ -> ws
