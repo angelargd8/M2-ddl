@@ -1,223 +1,194 @@
 from Automata.metachar import Metachar
 
+def agregarConcatenacion(tokens: list[str]) -> list[str]:
+    resultado = []
 
-def agregarConcatenacion(tokens):
-    result = []
+    for i in range(len(tokens) - 1):
+        actual = tokens[i]
+        siguiente = tokens[i + 1]
+        resultado.append(actual)
 
-    for i in range(len(tokens)):
-        c1 = tokens[i]
-        result.append(c1)
+        # Evitar concatenacion en casos especificos
+        if (
+            actual in ['(', '|'] or siguiente in [')', '|'] or
+            actual in ['ε', '#'] or siguiente in ['ε', '#'] or
+            actual == '.' or siguiente == '.' or
+            (actual == '*' and siguiente == 'ε') or
+            (actual == 'ε' and siguiente in ['|', '.', ')']) or
+            (actual == '|' and siguiente == 'ε') or
+            (actual.startswith('\\') and actual not in ['\\+', '\\-']) or
+            (siguiente.startswith('\\') and siguiente not in ['\\+', '\\-'])
+        ):
+            continue
 
-        if i + 1 < len(tokens):
-            c2 = tokens[i + 1]
-            if (
-                c1 != "("
-                and c2 != ")"
-                and c1 != "|"
-                and c2 != "|"
-                and not Metachar(c2).IsOperator()
-                and not Metachar(c1).IsBinaryOperator()
-                and c2 != "*"
-                and c2 != "+"
-                and c2 != "?"
-            ):
-                result.append(".")
-    return result
+        es_actual_valido = (
+            not Metachar.IsOperator(actual) or actual in [')', '*', '+', '?']
+        )
+        es_siguiente_valido = (
+            not Metachar.IsOperator(siguiente) or siguiente == '(' or siguiente.startswith('\\')
+        )
 
+        if es_actual_valido and es_siguiente_valido:
+            resultado.append('.')
+
+    resultado.append(tokens[-1])
+    return resultado
 
 # funcion para formatear la expresion regular para que se pueda trabajar con ella
-def formatRegEx(regex):
+def formatRegEx(regex: str) -> list[str]:
     # verificar que no es una expresion vacia
     if not regex:
-        return "ε"  # devuelbe epsilon para la expresion vacia
-
+        return ["ε"] # devuelbe epsilon para la expresion vacia
 
     # si regex empieza con un operador binario, agregar episolon al inicio
-    if Metachar(regex[0]).IsBinaryOperator():
-        regex = "ε" + regex
+    if Metachar.IsBinaryOperator(regex[0]):
+        regex = 'ε' + regex
 
-    stack_temp = []
+    regex_list = list(regex)
     i = 0
+    tokens = []
 
-    while i < len(regex):
-        c1 = regex[i]
+    def find_matching_open(lista, indice_cierre):
+        conteo = 1
+        k = indice_cierre - 1
+        while k >= 0 and conteo > 0:
+            if lista[k] == ')': conteo += 1
+            elif lista[k] == '(': conteo -= 1
+            k -= 1
+        return k + 1
 
+    def find_element_start(lista, pos):
+        if lista[pos] == ')':
+            return find_matching_open(lista, pos)
+        if lista[pos] in ['*', '+', '?']:
+            return find_element_start(lista, pos - 1)
+        return pos
+
+    while i < len(regex_list):
         # manejo de comillas
-        if Metachar(c1).IsQuoted():
-            quote_char = c1
-            literal = c1
+        if Metachar.IsQuoted(regex_list[i]):
+            quote_char = regex_list[i]
+            literal = regex_list[i]
             i += 1
-            while i < len(regex):
-                literal += regex[i]
-                if regex[i] == quote_char:
+            while i < len(regex_list):
+                literal += regex_list[i]
+                if regex_list[i] == quote_char:
+                    i += 1
                     break
                 i += 1
-            
-            stack_temp.append(literal)  # agregar el literal completo como un solo token
-            i += 1
-            continue
+            tokens.append(literal) # agregar el literal completo como un solo token
 
         # manejo de caracteres de escape
-        if c1 == "\\" and i + 1 < len(regex):
-            c2 = regex[i + 1]
-
-            if Metachar(c2).IsEscaped():  # si el caracter no es un operador
-                stack_temp.append(c1 + c2)
+        elif regex_list[i] == '\\':
+            if i + 1 < len(regex_list):
+                escape = regex_list[i] + regex_list[i + 1]
+                tokens.append(escape)
                 i += 2
-
             else:
                 # agregar el \, de forma normal
-                stack_temp.append("\\")
-                print(stack_temp)
+                tokens.append('\\')
                 i += 1
-            continue
 
         # manejo de operadores
-        elif c1 == "?":
-            if not stack_temp:
-                raise ValueError(
-                    "operador ?, sin operador previo en la posicion: " + str(i)
-                )
-
-            t = stack_temp.pop()  # obtener el ultimo valor ingresado
-
-            # si es un parentesis tomar todo lo que esta dentro del parentesis
-            if t.startswith(")"):
-                balanceador_i = 0
-                balanceador_d = 1
-                grupo = [t]
-
-                while balanceador_i != balanceador_d and stack_temp:
-                    if not stack_temp:
-                        raise ValueError("Parentesis no balanceados")
-
-                    top = stack_temp.pop()
-                    grupo.append(top)
-
-                    if top == ")":
-                        balanceador_d += 1
-                    elif top == "(":
-                        balanceador_i += 1
-
-                grupo.reverse()
-                t = "".join(grupo)
-
-            stack_temp.extend(["(", "ε", "|", t, ")"])
-            i += 1
-            continue
+        elif regex_list[i] == '?':
+            if tokens and not tokens[-1].startswith('\\'):
+                fin = len(tokens) - 1
+                ini = find_element_start(tokens, fin)
+                operando = tokens[ini:fin + 1]
+                tokens = tokens[:ini] + ['('] + operando + ['|', 'ε', ')']
+                i += 1
+            else:
+                tokens.append('?')
+                i += 1
 
         # manejo del operador +
-        elif c1 == "+":
-            if not stack_temp:
-                raise ValueError(
-                    "operador +, sin operador previo en la posicion: " + str(i)
-                )
-            t = stack_temp.pop()  # obtiene el ultimo valor ingresado
+        elif regex_list[i] == '+':
+            if tokens and not tokens[-1].startswith('\\'):
+                fin = len(tokens) - 1
+                ini = find_element_start(tokens, fin)
+                operando = tokens[ini:fin + 1]
+                # tokens = tokens[:ini] + operando + ['.'] + operando + ['*']
+                tokens = tokens[:ini] + ['('] + operando + ['.'] + operando + ['*', ')']
+                i += 1
+            else:
+                tokens.append('+')
+                i += 1
 
-            # si no es un valor unico, si no algo que esta en parentesis se obtiene todo lo que esta en el parentesis
-            if t.startswith(")"):
-                balanceador_i = 0
-                balanceador_d = 1
+        
 
-                grupo = [t]
-
-                while balanceador_i != balanceador_d and stack_temp:
-
-                    if not stack_temp:  # verificar si el stack esta vacio
-                        raise ValueError("Parentesis no balanceados")
-
-                    top = stack_temp.pop()
-                    grupo.append(top)
-                    if top == ")":
-                        balanceador_d += 1
-                    if top == "(":
-                        balanceador_i += 1
-
-                grupo.reverse()
-                t = "".join(grupo)
-
-            stack_temp.extend(["(", t, t, "*", ")"])
-
-            i += 1
-            continue
         else:
-            stack_temp.append(c1)
+            tokens.append(regex_list[i])
             i += 1
 
-    if stack_temp and Metachar(stack_temp[-1]).IsBinaryOperator():
-        stack_temp.append("ε")
-
-    # agregar el operador de concatenacion
-    tokens_concatenados = agregarConcatenacion(stack_temp)
-    regex_result = "".join(tokens_concatenados)
-    return regex_result
+    final = agregarConcatenacion(tokens)
+    return final
 
 
 # fucncion para convertir una expresion regular de notacion infix a postfix
 # aqui es donde se usa shunting yard
-def infixToPostfix(regex):
-
+def infixToPostfix(regex: str) -> str:
     if not regex:
-        return "ε"  # para el manejo de entrada vacia
+        return "ε" # para el manejo de entrada vacía
+    
+    print("regex: " + regex)
 
-    postfix = ""
-    stack = []
-    regex = formatRegEx(regex)
+    # Formatear la expresión regular
+    tokens = formatRegEx(regex)
     print("\nExpresion formateada: \n" + regex)
 
-    i = 0
+    salida = ""
+    stack = []
 
-    while i < (len(regex)):
-        c = regex[i]
-        # manejo del parentesis
-        if c == "(":
-            stack.append(c)
-        elif c == ")":
-            while stack and stack[-1] != "(":
-                # print("\STACK: ". join(stack))
-                postfix += stack.pop()
-
-            if not stack or stack[-1] != "(":
-                raise ValueError("Parentesis no balanceados")
-
-            stack.pop()  # quitar el parentesis izquierdo
-
-        # manejo de caracteres de escape
-
-        elif c == "\\" and i + 1 < len(regex):
-            c2 = regex[i + 1]
-            postfix += "\\" + c2
-            i += 2
+    for simbolo in tokens:
+        if simbolo == ' ':
             continue
 
-        # manejo de operadores
+        if simbolo.startswith('\\') and len(simbolo) == 2:
+            salida += simbolo
+            continue
+
+        if simbolo == '(':
+            stack.append(simbolo)
+
+        elif simbolo == ')':
+            while stack and stack[-1] != '(':
+                salida += stack.pop()
+
+            if stack and stack[-1] == '(':
+                stack.pop()
+
+        elif simbolo in ['*', '?']:
+            salida += simbolo
+
+        elif Metachar.IsOperator(simbolo):
+
+            while stack and stack[-1] != '(' and Metachar.IsOperator(stack[-1]) and Metachar.getPrecedence(stack[-1]) >= Metachar.getPrecedence(simbolo):
+                if stack[-1] == '.' and salida and salida[-1] == '.':
+                    # Evitar agregar un segundo punto 
+                    stack.pop()
+                    continue
+                salida += stack.pop()
+
+
+            stack.append(simbolo)
         else:
-            while stack:
-                peekedChar = stack[-1]
+            salida += simbolo
 
-                if peekedChar == "(":
-                    break
-
-                peekedCharPrecedence = Metachar(peekedChar).getPrecedence(peekedChar)
-                currentCharPrecedence = Metachar(c).getPrecedence(c)
-
-                if peekedCharPrecedence >= currentCharPrecedence:
-                    postfix += stack.pop()
-                else:
-                    break
-
-            stack.append(c)
-
-        i += 1
-
-    # vaciar los operadores restantes de la pila
     while stack:
-        op = stack.pop()
-        if op == "(":
-            raise ValueError("Parentesis no balanceados")
+        operador = stack.pop()
+        # no agregar punto si el ultimo caracter ya es un punto
+        if operador == '.' and salida and salida[-1] == '.':
+            continue
+        salida += operador
 
-        postfix += op
+    # reemplazar puntos consecutivos si existieran
+    while '..' in salida:
+        salida = salida.replace('..', '.')
+    
+    # asegurar que hay un punto antes de #
+    if not salida.endswith('.'):
+        salida += '.'
+    
+    salida += '#.'
 
-    # agregar el simbolo # (fin de la cadena) a la expresion postfix
-    postfix += "#."
-    return postfix
+    return salida
