@@ -26,7 +26,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 # Carpeta de salida
-OUTPUT_DIR = "../src/Yalex/Out"
+OUTPUT_DIR = "../src/Yalex/generatorAFDS"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
@@ -123,12 +123,13 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
         j = i
         ultimo_estado_final = None
         ultima_pos_final = i
+        token_encontrado = None
 
         while j < len(texto):
             c = texto[j]
             transiciones = automata.afd.transiciones.get(estado_actual, {})
 
-            if c == "+" or c == "(" or c == ")" or c == "*":
+            if c in {"+", "(", ")", "*", "."}:
                 c = "\\" + c
             if c in transiciones:
                 estado_actual = transiciones[c]
@@ -136,16 +137,55 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
                 if estado_actual in automata.afd.estados_finales:
                     ultimo_estado_final = estado_actual
                     ultima_pos_final = j
+                    token_encontrado = automata.estado_a_token.get(estado_actual)
             else:
                 break
 
         if ultimo_estado_final is not None:
             lexema = texto[i:ultima_pos_final]
-            token = automata.estado_a_token.get(ultimo_estado_final, "UNKNOWN")
-            resultados.append([lexema, token])
+            resultados.append([lexema, token_encontrado])
             i = ultima_pos_final
         else:
             resultados.append([texto[i], "ERROR"])
             i += 1
 
     return resultados
+
+
+def leerArchivo(ruta):
+    try:
+        with open(ruta, "r", encoding="utf-8") as archivo:
+            return archivo.read()
+    except Exception as e:
+        print(f"Error al leer {ruta}: {e}")
+        return None
+
+
+ruta = "C://Users//pablo//OneDrive - UVG//Escritorio//UVG//7mo Semestre//Diseño de lenguajes de Programacion//Modulo 2//Fase de Compilacion//M2-ddl//src//Test.txt"
+
+texto_prueba = leerArchivo(ruta)
+
+# "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
+# ((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*a
+tokens = {
+    "WHITESPACE": "( |\\t|\\n)+",
+    "ID": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*",
+    # "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(\\.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
+    "PLUS": "\\+",
+    "MINUS": "-",
+    "TIMES": "\\*",
+    "DIV": "/",
+    "LPAREN": "\\(",
+    "RPAREN": "\\)",
+}
+
+
+lexical_automata = generar_afd_unificado(tokens)
+_serialize_automata(lexical_automata, "lexical_out")
+
+print("\nContenido de Test.txt: \n")
+print(texto_prueba)
+
+
+resultado = simular_texto(texto_prueba, lexical_automata)
+print(resultado)

@@ -34,7 +34,6 @@ for archivo_yal in archivos:
 
         yal = yalReader(contenido_yal)
         tokens = yal.get_tokens()
-        print(tokens)
 
         print("Tokens detectados:")
         for nombre, expr in tokens.items():
