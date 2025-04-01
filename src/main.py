@@ -26,7 +26,7 @@ def guardar_resultado_en_txt(resultados, archivo_salida):
 archivos = ["slr-2.yal"]  # Lista de archivos YAL
 
 for archivo_yal in archivos:
-    ruta = os.path.join("Yalex/yalDocs", archivo_yal)
+    ruta = os.path.join("src//Yalex//yalDocs//", archivo_yal)
     contenido_yal = leerArchivo(ruta)
 
     if contenido_yal:
@@ -43,7 +43,7 @@ for archivo_yal in archivos:
         automata_lexico = generar_afd_unificado(tokens)
         _serialize_automata(automata_lexico, "lexical_out")
 
-        texto_prueba = (leerArchivo("Test.txt"))
+        texto_prueba = leerArchivo("src//Test.txt")
         if texto_prueba:
             print("\nContenido de Test.txt:")
             print(texto_prueba)
@@ -54,8 +54,8 @@ for archivo_yal in archivos:
             for palabra, token in resultados:
                 print(f"{palabra} -> {token}")
 
-            guardar_resultado_en_txt(resultados, "Yalex/Out/TokensRead.txt")
-            print("\nResultados guardados en Yalex/Out/TokensRead.txt")
+            guardar_resultado_en_txt(resultados, "src/Yalex/Out/TokensRead.txt")
+            print("\nResultados guardados en src/Yalex/Out/TokensRead.txt")
 
 
 tokens = {
@@ -71,5 +71,5 @@ tokens = {
     "TIMES": "\\*",
     "DIV": "/",
     "LPAREN": "\\(",
-    "RPAREN":"\\)",
+    "RPAREN": "\\)",
 }
