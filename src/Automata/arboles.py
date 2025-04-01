@@ -1,6 +1,5 @@
 from Automata.Node import *
 
-
 #arbol sintactico
 #1. preparar stack vacio
 #2. pricesar cada simbolo de la expresion postfix
@@ -10,6 +9,57 @@ from Automata.Node import *
 #funciones del arbol sintactico
 #anulable, primerapos, ultimapos, siguientepos
 
+def tokenize_postfix(postfix: str) -> list:
+    tokens = []
+    i = 0
+    while i < len(postfix):
+
+        # if postfix[i] == "\\" and i + 1 < len(postfix) or postfix[i] == "\\\\" and i + 1 < len(postfix):
+        #     tokens.append(postfix[i] + postfix[i + 1])
+        #     i += 2
+
+        #manejo de caracteres escapados
+        if postfix[i] == "\\":
+            if i + 1 < len(postfix):
+                #caso 1: escapes comunes: \n, \t, \r, \v, \\
+                if postfix[i + 1] in {"n", "t", "r", "v", "\\"}:
+                    tokens.append(postfix[i] + postfix[i + 1])
+                    i += 2
+                    continue
+
+                #caso 2: \+ o \- 
+                if postfix[i + 1] == "\\" and i + 2 < len(postfix):
+                    escaped_char = postfix[i + 2]
+                    tokens.append("\\" + escaped_char)  #\+
+                    i += 3
+                    continue
+
+                #cualquier otro tipo de escape
+                tokens.append(postfix[i] + postfix[i + 1])
+                i += 2
+                continue
+
+
+
+        # Manejo de literales entre comillas
+        elif postfix[i] in {"'", '"', "`"}:
+            # Si el literal empieza con una comilla, buscar el cierre
+            # y agregarlo como un token completo
+            quote_char = postfix[i]
+            literal = postfix[i]
+            i += 1
+            while i < len(postfix):
+                literal += postfix[i]
+                if postfix[i] == quote_char:
+                    break
+                i += 1
+            tokens.append(literal)
+            i += 1
+        else:
+            tokens.append(postfix[i])
+            i += 1
+    return tokens
+
 
 def construirArbolSintactico(postfix: str) -> Node:
     #1
@@ -17,54 +67,22 @@ def construirArbolSintactico(postfix: str) -> Node:
     operators = {"|": 2, ".": 2, "*": 1, "+": 1, "?":1 , "#": 3, "^":5, "e":6, "ε":6}
 
     print('procesando la expresion postfix: ' + postfix)
-
     # 2
-    i = 0 
+    tokens = tokenize_postfix(postfix)
+    print(f"Tokens: {tokens}")
+    print("POSTFIX:", postfix)
 
-    while i < len(postfix): 
-        simbolo = postfix[i]
-        # print('procesando simbolo: ' + simbolo)
+    for simbolo in tokens:
+        
+        print('procesando simbolo: ' + simbolo)
 
-        #manejar literales entre comillas
-        if simbolo in {"'", '"', "`"}:
-            quote_char = simbolo
-            literal = simbolo
-            i += 1
-            while i < len(postfix):
-                literal += postfix[i]
-                if postfix[i] == quote_char:
-                    break
-                i += 1
-            node = Node(literal)
-            node.firstpos.add(node.id)
-            node.lastpos.add(node.id)
-            node.nullable = False
-            stack.append(node)
-            i += 1
-            continue
-
-        #manejar simbolos escapados
-        if simbolo == "\\" and i + 1 < len(postfix):
-            #tratar el simbolo escapado como una unidad
-            simbolo_escapado = simbolo + postfix[i + 1]
-            print(f"Encontrado símbolo escapado: {repr(simbolo_escapado)}")
-            node = Node(simbolo_escapado)
-            node.firstpos.add(node.id)
-            node.lastpos.add(node.id)
-            node.nullable = False
-            stack.append(node)
-            i +=2
-            continue
-
-        #operando (valor o variable)
+        # cuando es un operando, diagamos literales, escapados o comillas
         if simbolo not in operators:
-            # 3
             node = Node(simbolo)
             node.firstpos.add(node.id)
             node.lastpos.add(node.id)
             node.nullable = False
             stack.append(node)
-            i += 1
             continue
             
 
@@ -74,7 +92,6 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos.add(node.id)
             node.nullable = False
             stack.append(node)
-            i += 1
             continue
 
 
@@ -98,7 +115,6 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos = node.left.lastpos.copy()
 
             stack.append(node)
-            i += 1
             continue
 
         if simbolo in [".", "|"]:
@@ -130,7 +146,6 @@ def construirArbolSintactico(postfix: str) -> Node:
                 node.nullable = node.left.nullable or node.right.nullable
 
             stack.append(node)
-            i += 1
             continue
 
         if simbolo =="^":
@@ -146,14 +161,12 @@ def construirArbolSintactico(postfix: str) -> Node:
             node.lastpos = node.left.lastpos.copy()
 
             stack.append(node)
-            i += 1
             continue
 
         if simbolo =="e" or simbolo == 'ε':
             node = Node(simbolo)
             node.nullable = True
             stack.append(node)
-            i += 1
             continue
 
         #si se llega aca hay un simbolo no reconocido
@@ -163,11 +176,15 @@ def construirArbolSintactico(postfix: str) -> Node:
     if len(stack) == 1:
         print('arbol sintactico construido correctamente')
         final_node = stack[0]
+        print("Stack final:", len(stack))
         return final_node
     else:
         print(f'arbol sintactico construido incorrectamente, elementos en stack: {len(stack)}')
         for idx, node in enumerate(stack):
             print(f"Stack[{idx}]: {node.value}")
+        if len(stack) > 1:
+            print("Error: Quedaron múltiples nodos sin combinar en la pila.")
+            print("Esto puede deberse a operadores binarios sin suficientes operandos.")
         return None
         
 
@@ -195,41 +212,3 @@ def imprimirArbolSintactico(nodo: Node, sangria: str = "", es_ultimo: bool = Tru
         imprimirArbolSintactico(nodo.left, sangria_nueva, nodo.right is None)
     if nodo.right:
         imprimirArbolSintactico(nodo.right, sangria_nueva, True)
-
-
-
-#esta parte es el arbol que ya teníamos en TC
-# esto era para el afn
-def construirArbol(e):
-    stack = []
-    operators = {"|": 2, ".": 2, "*": 1, "+": 1}
-
-    for c in e:
-        if c not in operators:
-            node = Node(c)
-            stack.append(node)
-        else:
-            if operators[c] == 2:
-                right_operand = stack.pop()
-                try:
-                    left_operand = stack.pop()
-                except IndexError:
-                    node = Node(c)
-                    node.left = None
-                    node.right = right_operand
-                    stack.append(node)
-                    continue
-
-                node = Node(c)
-                node.right = right_operand
-                node.left = left_operand
-                stack.append(node)
-
-            else:
-                operand = stack.pop()
-                node = Node(c)
-                node.left = operand
-                node.right = None
-                stack.append(node)
-
-    return stack.pop()

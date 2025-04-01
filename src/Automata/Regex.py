@@ -114,7 +114,7 @@ def formatRegEx(regex: str) -> list[str]:
                 tokens.append('+')
                 i += 1
 
-        
+
 
         else:
             tokens.append(regex_list[i])
@@ -128,13 +128,12 @@ def formatRegEx(regex: str) -> list[str]:
 # aqui es donde se usa shunting yard
 def infixToPostfix(regex: str) -> str:
     if not regex:
-        return "ε" # para el manejo de entrada vacía
-    
-    print("regex: " + regex)
+        return "ε#." # para el manejo de entrada vacía
+
 
     # Formatear la expresión regular
     tokens = formatRegEx(regex)
-    print("\nExpresion formateada: \n" + regex)
+    print("Expresion formateada: \n" + regex)
 
     salida = ""
     stack = []
@@ -164,7 +163,7 @@ def infixToPostfix(regex: str) -> str:
 
             while stack and stack[-1] != '(' and Metachar.IsOperator(stack[-1]) and Metachar.getPrecedence(stack[-1]) >= Metachar.getPrecedence(simbolo):
                 if stack[-1] == '.' and salida and salida[-1] == '.':
-                    # Evitar agregar un segundo punto 
+                    # Evitar agregar un segundo punto
                     stack.pop()
                     continue
                 salida += stack.pop()
@@ -175,20 +174,35 @@ def infixToPostfix(regex: str) -> str:
             salida += simbolo
 
     while stack:
-        operador = stack.pop()
-        # no agregar punto si el ultimo caracter ya es un punto
-        if operador == '.' and salida and salida[-1] == '.':
-            continue
-        salida += operador
+        salida += stack.pop()
 
     # reemplazar puntos consecutivos si existieran
     while '..' in salida:
         salida = salida.replace('..', '.')
-    
-    # asegurar que hay un punto antes de #
-    if not salida.endswith('.'):
-        salida += '.'
-    
-    salida += '#.'
 
+
+    # # asegurar que hay un punto antes de #
+    # if not salida.endswith('.'):
+    #     salida += '.'
+    # if not salida.endswith('#'):
+    #     salida += '#'
+    # if not salida.endswith('.'):
+    #     salida += '.'
+
+    salida += '#.' #--
+
+    if not salida.endswith("#.") and not salida.endswith(".#."): #--
+        salida += "#."
+
+    # if salida.endswith('.#.'):
+    #     salida = salida[:-1]
+    # elif not salida.endswith('#.'):
+    #     salida += '#.'
+
+    # if not salida.endswith('.'):
+    #     salida += '.'
+    # salida += '#.'
+
+
+    print("postfix: \n" + salida)
     return salida

@@ -1,5 +1,3 @@
-# from graphviz import Graph
-from Automata.metachar import Metachar
 
 class Node:
     

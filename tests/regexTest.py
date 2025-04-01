@@ -12,9 +12,9 @@ class TestRegex(unittest.TestCase):
         self.assertEqual(infixToPostfix("(a|b)+"), "ab|ab|*.#.")
         self.assertEqual(infixToPostfix(r"(\t|\n)+"), r"\t\n|\t\n|*.#.")
         self.assertEqual(infixToPostfix("(a|b)\\+"), "ab|\\+.#.")
-        self.assertEqual(infixToPostfix(r"\t|\n"), r"\t\n|.#.")
-        self.assertEqual(infixToPostfix(r"|\t|\n"), r"ε\t|\n|.#.")
-        self.assertEqual(infixToPostfix(r"' '|\\n|\\t"), r"' '\\n|\\t|.#.")
+        self.assertEqual(infixToPostfix(r"\t|\n"), r"\t\n|#.")
+        self.assertEqual(infixToPostfix(r"|\t|\n"), r"ε\t|\n|#.")
+        self.assertEqual(infixToPostfix(r"' '|\\n|\\t"), r"' '\\n|\\t|#.")
         self.assertEqual(infixToPostfix("(A)((A|B|C|D)|(0|1|2|3|4|5|6|7|8|9))*"), "AAB|C|D|01|2|3|4|5|6|7|8|9||*.#.")
 
         regex = "(((0|1|2|3|4|5|6|7|8|9))+)(.(((0|1|2|3|4|5|6|7|8|9))+))?(E(\\+|\\-)?(((0|1|2|3|4|5|6|7|8|9))+))?"
