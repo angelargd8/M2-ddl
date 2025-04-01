@@ -36,7 +36,7 @@ class yalReader:
     def get_trailer(self):
         return self.trailer
 
-    def expand_optional(expression: str) -> str:
+    def expand_optional(self,expression) :
         new_exp = ""
         stack = []  # Pila para rastrear los índices de paréntesis abiertos
         i = 0
@@ -70,12 +70,16 @@ class yalReader:
         return new_exp
 
 
-
     # diccionario de los tokens en regex para generacion posterior de afds
     def parse_tokens(self):
         for key in self.rules_tokens:
             if key in self.dicc: # remplaza los regex ya creados
-                self.tokens[self.rules_tokens[key]] = self.dicc[key]
+                remplazo = self.dicc[key]
+                if "?" in remplazo:
+                    remplazo = self.expand_optional(remplazo)
+                remplazo.replace("\\t", "\t")
+                remplazo.replace("\\s", "\s")
+                self.tokens[self.rules_tokens[key]] = remplazo
             else: # si no es regex jalar solo el valor que tiene
                 key = key.strip()
                 print(key)

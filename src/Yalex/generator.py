@@ -26,7 +26,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 # Carpeta de salida
-OUTPUT_DIR = "./src/Yalex/generatorAFDS"
+OUTPUT_DIR = "../src/Yalex/Out"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
@@ -44,6 +44,8 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     # Generar expresiones con finalizador único usando @idx@
     for idx, (nombre_token, expresion) in enumerate(tokens.items()):
         expresion = expresion.replace("\\n", "\n")
+        expresion = expresion.replace("\\t", "\t")
+        expresion = expresion.replace("\\s", "\s")
         marcador = f"@{idx}@"
         expresiones.append(f"({expresion}){marcador}")
         token_map[str(idx)] = nombre_token
