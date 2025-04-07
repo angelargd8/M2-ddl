@@ -1,10 +1,10 @@
 from Automata.Node import *
+from Automata.metachar import Metachar
 
 #arbol sintactico
 #1. preparar stack vacio
 #2. pricesar cada simbolo de la expresion postfix
 #3. crear nosots para cada operando 
-#4. continuar procesando hasta el final de cada expresion
 
 #funciones del arbol sintactico
 #anulable, primerapos, ultimapos, siguientepos
@@ -14,9 +14,6 @@ def tokenize_postfix(postfix: str) -> list:
     i = 0
     while i < len(postfix):
 
-        # if postfix[i] == "\\" and i + 1 < len(postfix) or postfix[i] == "\\\\" and i + 1 < len(postfix):
-        #     tokens.append(postfix[i] + postfix[i + 1])
-        #     i += 2
 
         #manejo de caracteres escapados
         if postfix[i] == "\\":
@@ -27,7 +24,7 @@ def tokenize_postfix(postfix: str) -> list:
                     i += 2
                     continue
 
-                #caso 2: \+ o \- 
+                #caso 2: \+ o \- \.
                 if postfix[i + 1] == "\\" and i + 2 < len(postfix):
                     escaped_char = postfix[i + 2]
                     tokens.append("\\" + escaped_char)  #\+
@@ -61,134 +58,62 @@ def tokenize_postfix(postfix: str) -> list:
     return tokens
 
 
-def construirArbolSintactico(postfix: str) -> Node:
-    #1
-    stack = []
-    operators = {"|": 2, ".": 2, "*": 1, "+": 1, "?":1 , "#": 3, "^":5, "e":6, "ε":6}
+def construirArbolSintactico(tokens: str) -> Node:
+    # funcion recursiva de backtracking para construir el arbol sintactico
+    def backtrack(index):
+        # print("index: " + str(index))
+        token = tokens[index]
+        print(f"////////// token '{token}'")
 
-    print('procesando la expresion postfix: ' + postfix)
-    # 2
-    tokens = tokenize_postfix(postfix)
-    print(f"Tokens: {tokens}")
-    print("POSTFIX:", postfix)
-
-    for simbolo in tokens:
+        #no es un operador, puede ser epsilon o un literal
+        if not Metachar.IsBinaryOperator(token) and not Metachar.IsUnaryOperator(token):
+            # print("OPERANDO: " + str(token))
+            node = Node(token)
+            node.firstpos.add(node.id)
+            node.lastpos.add(node.id)
+            node.nullable = token in ['ε', 'e']
+            return node, index - 1
         
-        print('procesando simbolo: ' + simbolo)
+        #es un operador unario puede tener un hijo 
+        if Metachar.IsUnaryOperator(token):
+            # print("UNARIO: " + str(token))
+            child, next_index = backtrack(index - 1)
+            node = Node(token)
+            node.left = child
+            node.nullable = token in ['*', '?'] or child.nullable # '*' y '?' permiten 0 ocurrencias, por eso son anulables
+            node.firstpos = child.firstpos.copy()
+            node.lastpos = child.lastpos.copy()
+            return node, next_index
+ 
+        #es un operador binario puede tener dos hijos
+        if Metachar.IsBinaryOperator(token):
+            # print("BINARIO: " + str(token))
+            right, i1 = backtrack(index - 1 )
+            left, i2 = backtrack(i1)
+            node = Node(token)
+            node.left = left
+            node.right = right
 
-        # cuando es un operando, diagamos literales, escapados o comillas
-        if simbolo not in operators:
-            node = Node(simbolo)
-            node.firstpos.add(node.id)
-            node.lastpos.add(node.id)
-            node.nullable = False
-            stack.append(node)
-            continue
+
+            #concatenacion
+            if token == '.':
+                node.nullable = left.nullable and right.nullable
+                node.firstpos = left.firstpos if not left.nullable else left.firstpos | right.firstpos
+                node.lastpos = right.lastpos if not right.nullable else right.lastpos | left.lastpos
+            #union
+            elif token == '|':
+                node.nullable = left.nullable or right.nullable
+                node.firstpos = left.firstpos | right.firstpos
+                node.lastpos = left.lastpos | right.lastpos
             
-
-        if simbolo == "#":
-            node = Node(simbolo)
-            node.firstpos.add(node.id)
-            node.lastpos.add(node.id)
-            node.nullable = False
-            stack.append(node)
-            continue
-
-
-        if simbolo in ["*", "+",  "?"]:
-
-            #verificar si hay operandos disponibles
-            if not stack:
-                raise ValueError(f"expresion postfix invalida: {postfix}")
-
-            node = Node(simbolo)
-            node.left = stack.pop()
-            node.right = None
-            
-
-            if simbolo == "*" or simbolo == "?":        # '*' y '?' permiten 0 ocurrencias, por eso son anulables
-                node.nullable = True
-            else:  
-                node.nullable = node.left.nullable
-
-            node.firstpos = node.left.firstpos.copy()
-            node.lastpos = node.left.lastpos.copy()
-
-            stack.append(node)
-            continue
-
-        if simbolo in [".", "|"]:
-            if len(stack) < 2:
-                raise ValueError(f"expresion postfix invalida: {postfix}")
-            
-            node =Node(simbolo)
-            node.right = stack.pop()
-            node.left = stack.pop()
-            node.nullable = node.left.nullable and node.right.nullable
-            
-            if simbolo == ".":
-
-                if node.left.nullable:
-                    node.firstpos = node.left.firstpos.union(node.right.firstpos)
-                else:
-                    node.firstpos = node.left.firstpos.copy()
-
-
-                if node.right.nullable:
-                    node.lastpos = node.right.lastpos.union(node.left.lastpos)
-                else:
-                    node.lastpos = node.right.lastpos.copy()
-
-
-            if simbolo == "|":
-                node.firstpos = node.left.firstpos.union(node.right.firstpos)
-                node.lastpos = node.right.lastpos.union(node.left.lastpos)
-                node.nullable = node.left.nullable or node.right.nullable
-
-            stack.append(node)
-            continue
-
-        if simbolo =="^":
-            if len(stack) < 1:
-                raise ValueError(f"expresion postfix invalida: {postfix}")
-            
-            node = Node(simbolo)
-            node.left = stack.pop()
-            node.right = None
-            node.nullable = False
-            #cuando son de anclaje no cambian los firstpos y lastpos
-            node.firstpos = node.left.firstpos.copy()
-            node.lastpos = node.left.lastpos.copy()
-
-            stack.append(node)
-            continue
-
-        if simbolo =="e" or simbolo == 'ε':
-            node = Node(simbolo)
-            node.nullable = True
-            stack.append(node)
-            continue
-
-        #si se llega aca hay un simbolo no reconocido
-        raise ValueError(f"simbolo no reconocido en postfix: {simbolo}")
+            return node, i2
+        
+        raise ValueError(f"Token no reconocido: {token}")
     
-
-    if len(stack) == 1:
-        print('arbol sintactico construido correctamente')
-        final_node = stack[0]
-        print("Stack final:", len(stack))
-        return final_node
-    else:
-        print(f'arbol sintactico construido incorrectamente, elementos en stack: {len(stack)}')
-        for idx, node in enumerate(stack):
-            print(f"Stack[{idx}]: {node.value}")
-        if len(stack) > 1:
-            print("Error: Quedaron múltiples nodos sin combinar en la pila.")
-            print("Esto puede deberse a operadores binarios sin suficientes operandos.")
-        return None
-        
-
-
+    raiz, _ = backtrack(len(tokens) - 1)
+    print("===ARBOL SINTACTICO CONSTRUIDO===")
+    print("Raiz: " + str(raiz.displayValue()))
+    return raiz
 
 
 """
@@ -205,6 +130,8 @@ def imprimirArbolSintactico(nodo: Node, sangria: str = "", es_ultimo: bool = Tru
             sangria_nueva = sangria + "│  "
     else:
         print(str(nodo.__str__()))
+        # print(str(nodo.displayValue()) + f" (nullable={nodo.nullable})")
+
         sangria_nueva = "   "  # sangria para los hijos del nodo raiz
 
     # hijos recursivos

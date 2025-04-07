@@ -1,219 +1,188 @@
 from Automata.metachar import Metachar
+from collections import deque
 
 
-def agregarConcatenacion(tokens: list[str]) -> list[str]:
-    resultado = []
 
-    for i in range(len(tokens) - 1):
-        actual = tokens[i]
-        siguiente = tokens[i + 1]
-        resultado.append(actual)
+def InsertConcatenation(regex: str) -> list:
+    if not regex:
+        return "ε"
+    
+    regexProcesada = []
+    i = 0
 
-        # Evitar concatenacion en casos especificos
-        if (
-            actual in ["(", "|"]
-            or siguiente in [")", "|"]
-            or actual in ["ε", "#"]
-            or siguiente in ["ε", "#"]
-            or actual == "."
-            or siguiente == "."
-            or (actual == "*" and siguiente == "ε")
-            or (actual == "ε" and siguiente in ["|", ".", ")"])
-            or (actual == "|" and siguiente == "ε")
-            or (actual.startswith("\\") and actual not in ["\\+", "\\-"])
-            or (siguiente.startswith("\\") and siguiente not in ["\\+", "\\-"])
-        ):
+    while i < len(regex):
+        #si hay un caracter escapado
+        if i < len(regex) - 1 and Metachar.IsEscaped(regex[i]):
+            regexProcesada.append(f"\\\\{regex[i+1]}") #le puse 4, por como maneja python los escaspados, entonces al recibir el arbol ya tiene \\
+            i += 2
+            continue
+        elif i < len(regex) - 1 and Metachar.IsQuoted(regex[i]):
+            regexProcesada.append(f"{regex[i]}{regex[i+1]}{regex[i+2]}")
+            i += 3
+            continue
+        else: 
+            regexProcesada.append(regex[i])
+            i += 1
             continue
 
-        es_actual_valido = not Metachar.IsOperator(actual) or actual in [
-            ")",
-            "*",
-            "+",
-            "?",
-        ]
-        es_siguiente_valido = (
-            not Metachar.IsOperator(siguiente)
-            or siguiente == "("
-            or siguiente.startswith("\\")
-        )
+    result = []
+    i = 0
 
-        if es_actual_valido and es_siguiente_valido:
-            resultado.append(".")
+    while i < len(regexProcesada) - 1:
+        current = regexProcesada[i]
+        next_token = regexProcesada[i + 1]
 
-    resultado.append(tokens[-1])
-    return resultado
+        print("- CURRENT " + current )
+        print("- NEXT " + next_token )
+        print("//// ///////////")
+        result.append(current)
+
+        is_current_escaped = current.startswith('\\') if len(current) > 1 else False
+        is_next_escaped = next_token.startswith('\\') if len(next_token) > 1 else False
+
+        # Evitar concatenación entre dos operadores unarios (como +?)
+        if Metachar.IsUnaryOperator(current) and Metachar.IsUnaryOperator(next_token):
+            i += 1
+            continue  
 
 
-# funcion para formatear la expresion regular para que se pueda trabajar con ella
-def formatRegEx(regex: str) -> list[str]:
-    # verificar que no es una expresion vacia
+        # Reglas normales para concatenar
+        if next_token != '.' and current != '.' or next_token != '(' and current != '(':  #and not (Metachar.IsUnaryOperator(current) and Metachar.IsUnaryOperator(next_token)):
+            if (
+                (not is_current_escaped and current not in ['(', '|'] and
+                not Metachar.IsUnaryOperator(current) and
+                not is_next_escaped and next_token not in [')', '|', '*', '+', '?']) 
+                or
+                (not is_current_escaped and current in ['*', '+', '?', ')'] and
+                not is_next_escaped and next_token not in [')', '|', '*', '+', '?'])
+                ):
+
+                result.append('.')
+                print("actual" + "".join(result))
+
+        i += 1
+        continue
+
+    if regexProcesada:
+        result.append(regexProcesada[-1])
+
+    print("REGEX PROCESADA: " + str(result))
+    print("REGEX PROCESADA: " + "".join(result))
+    return result
+
+
+
+#algoritmo que convierte una expresion regular compuesta
+#por operadores definidos y operandos infiz a una operacion postfiz
+#usa colas
+#1 stack para almacernar los operadores de forma temporal por medio de su precendencia con lifo
+# 2. la output es donde se tendra la expresion regular en postfix, aqui es donde se usa la precedencia de operadores
+#
+def infixToPostfix(regex: str) -> str:
+
     if not regex:
-        return ["ε"]  # devuelbe epsilon para la expresion vacia
-
-    # si regex empieza con un operador binario, agregar episolon al inicio
+        return ["ε"]
+    
     if Metachar.IsBinaryOperator(regex[0]):
         regex = "ε" + regex
 
-    regex_list = list(regex)
+
+    #agregar la concatenacion a la expresion regular
+    # tokens = list("(((0|1|2|3|4|5|6|7|8|9))+).((((0|1|2|3|4|5|6|7|8|9))+))?.(E.(\+|-)?.(((0|1|2|3|4|5|6|7|8|9))+))?")
+    tokens = InsertConcatenation(regex)
+    print("----> REGEX CONCATEANDO: " + str(tokens))
+
+    operatorStack = [] # stack para los operadores
+    outputQueue = deque() # cola para la salida
+
+    #convertir la cadena en una lista de tokens
+    #  = list(regex)
+    # print("tokens:");print(tokens)
+   
     i = 0
-    tokens = []
+    #recorrer la lista de tokens
+    while i < len(tokens):
+        token = tokens[i]
+        print("=========================================== " )
+        print("TOKEN: " + str(token))
+        print("- output queue: "+ str(outputQueue))
+        print("- Operator stack:" +str(operatorStack))
 
-    def find_matching_open(lista, indice_cierre):
-        conteo = 1
-        k = indice_cierre - 1
-        while k >= 0 and conteo > 0:
-            if lista[k] == ")":
-                conteo += 1
-            elif lista[k] == "(":
-                conteo -= 1
-            k -= 1
-        return k + 1
+        #verificar si es un operador
+        if len(token) == 1 and Metachar.HasPrecedence(token):
 
-    def find_element_start(lista, pos):
-        if lista[pos] == ")":
-            return find_matching_open(lista, pos)
-        if lista[pos] in ["*", "+", "?"]:
-            return find_element_start(lista, pos - 1)
-        return pos
+            print("-----PRECEDENCIA: " + str(Metachar.precedence[token]) + "-----")
 
-    while i < len(regex_list):
-        # manejo de comillas
-        if Metachar.IsQuoted(regex_list[i]):
-            quote_char = regex_list[i]
-            literal = regex_list[i]
-            i += 1
-            while i < len(regex_list):
-                literal += regex_list[i]
-                if regex_list[i] == quote_char:
-                    i += 1
-                    break
-                i += 1
-            tokens.append(literal)  # agregar el literal completo como un solo token
+            if Metachar.precedence[token] == 0: # (
+                operatorStack.append(token)
+                # i += 1
+                # continue
 
-        # manejo de caracteres de escape
-        elif regex_list[i] == "\\":
-            if i + 1 < len(regex_list):
-                escape = regex_list[i] + regex_list[i + 1]
-                tokens.append(escape)
-                i += 2
-            else:
-                # agregar el \, de forma normal
-                tokens.append("\\")
-                i += 1
+            elif Metachar.precedence[token] == 4: # )
 
-        # manejo de operadores
-        elif regex_list[i] == "?":
-            if tokens and not tokens[-1].startswith("\\"):
-                fin = len(tokens) - 1
-                ini = find_element_start(tokens, fin)
-                operando = tokens[ini : fin + 1]
-                tokens = tokens[:ini] + ["("] + operando + ["|", "ε", ")"]
-                i += 1
-            else:
-                tokens.append("?")
-                i += 1
 
-        # manejo del operador +
-        elif regex_list[i] == "+":
-            if tokens and not tokens[-1].startswith("\\"):
-                fin = len(tokens) - 1
-                ini = find_element_start(tokens, fin)
-                operando = tokens[ini : fin + 1]
-                # tokens = tokens[:ini] + operando + ['.'] + operando + ['*']
-                tokens = tokens[:ini] + ["("] + operando + ["."] + operando + ["*", ")"]
-                i += 1
-            else:
-                tokens.append("+")
-                i += 1
+                #saccar los operadores hasta encontrar los parentesis izquierdo
+                while operatorStack and Metachar.precedence[operatorStack[-1]] != 0:
+                    print("////OPERADORES ////")
+                    outputQueue.append(operatorStack.pop())
+        
 
+                    # if Metachar.HasPrecedence(outputQueue[-1]):
+
+                    #     if Metachar.precedence[outputQueue[-1]] == 3 and Metachar.precedence[operatorStack[-1]] == 2:
+                    #         print("////OPERADORES QUE NO NECESITAN PUNTO////")
+                    #         operatorStack.pop()
+                    #     else: 
+                    #         print("/////- SACANDO OPERADOR DEL STACK- //////")
+                    #         outputQueue.append(operatorStack.pop())
+                    # else: 
+                    #     outputQueue.append(operatorStack.pop())
+                    
+                
+                if operatorStack and Metachar.precedence[operatorStack[-1]] == 0: 
+                    #eliminar el parentesis izquierdo
+                    operatorStack.pop() 
+
+            
+            elif Metachar.IsUnaryOperator(token): #* + ?
+                #agregar el operador al stack
+                operatorStack.append(token)
+                
+
+            
+            
+            else: 
+                # mientras que hayua un operador en el stack con mayor o igual precendencia
+                while (operatorStack and Metachar.precedence[operatorStack[-1]] != 0 and  #que no sea ( y haya operatorStack
+                       Metachar.precedence.get(operatorStack[-1], 0) >= Metachar.precedence.get(token, 0)):
+                    
+                    # sacar el operador del stack y agregarlo a la salida
+                    outputQueue.append(operatorStack.pop())
+                
+                # # #agregar el operador al stack
+                operatorStack.append(token)
+                
+                # i += 1
+                # continue
         else:
-            tokens.append(regex_list[i])
-            i += 1
+            print("-----NO ES UN OPERADOR-----")
+            #es un operando o un caracter escapado, se agrega a la salida
+            outputQueue.append(token)
+        i += 1
+        continue
 
-    final = agregarConcatenacion(tokens)
-    return final
+    #sacar los operadores restantes del stack y agregarlos a la salida
+    while operatorStack:
+        if Metachar.precedence[operatorStack[-1]] == 0: 
+            return "error: Parentesis desbalanceados"
+        outputQueue.append(operatorStack.pop())
+
+    #agregar el final 
+    outputQueue.append('#')
+    outputQueue.append('.')
 
 
-# fucncion para convertir una expresion regular de notacion infix a postfix
-# aqui es donde se usa shunting yard
-def infixToPostfix(regex: str) -> str:
-    if not regex:
-        return "ε#."  # para el manejo de entrada vacía
+    result = ''.join(outputQueue)
+    print("RESULTADO: " + result)
 
-    # Formatear la expresión regular
-    tokens = formatRegEx(regex)
-    print("Expresion formateada: \n" + regex)
-
-    salida = ""
-    stack = []
-
-    for simbolo in tokens:
-        # if simbolo == ' ':
-        #     continue
-
-        if simbolo.startswith("\\") and len(simbolo) == 2:
-            salida += simbolo
-            continue
-
-        if simbolo == "(":
-            stack.append(simbolo)
-
-        elif simbolo == ")":
-            while stack and stack[-1] != "(":
-                salida += stack.pop()
-
-            if stack and stack[-1] == "(":
-                stack.pop()
-
-        elif simbolo in ["*", "?"]:
-            salida += simbolo
-
-        elif Metachar.IsOperator(simbolo):
-
-            while (
-                stack
-                and stack[-1] != "("
-                and Metachar.IsOperator(stack[-1])
-                and Metachar.getPrecedence(stack[-1]) >= Metachar.getPrecedence(simbolo)
-            ):
-                if stack[-1] == "." and salida and salida[-1] == ".":
-                    # Evitar agregar un segundo punto
-                    stack.pop()
-                    continue
-                salida += stack.pop()
-
-            stack.append(simbolo)
-        else:
-            salida += simbolo
-
-    while stack:
-        salida += stack.pop()
-
-    # reemplazar puntos consecutivos si existieran
-    while ".." in salida:
-        salida = salida.replace("..", ".")
-
-    # # asegurar que hay un punto antes de #
-    # if not salida.endswith('.'):
-    #     salida += '.'
-    # if not salida.endswith('#'):
-    #     salida += '#'
-    # if not salida.endswith('.'):
-    #     salida += '.'
-
-    salida += "#."  # --
-
-    if not salida.endswith("#.") and not salida.endswith(".#."):  # --
-        salida += "#."
-
-    # if salida.endswith('.#.'):
-    #     salida = salida[:-1]
-    # elif not salida.endswith('#.'):
-    #     salida += '#.'
-
-    # if not salida.endswith('.'):
-    #     salida += '.'
-    # salida += '#.'
-
-    print("postfix: \n" + salida)
-    return salida
+    return result
