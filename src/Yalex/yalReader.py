@@ -42,17 +42,18 @@ class yalReader:
         i = 0
 
         while i < len(expression):
-            if expression[i] == "?":
-                if stack:
-                    # Último paréntesis abierto
-                    start = stack.pop()
-                    substr = new_exp[start:]  # Extraer contenido desde el paréntesis
-                    new_exp = new_exp[:start] + f"(ε|{substr})"
-                else:
-                    # Si no hay paréntesis, tomar el último carácter como afectado
-                    new_exp = new_exp[:-1] + f"(ε|{new_exp[-1]})"
-                i += 1  # Saltar el '?'
-            elif expression[i] == ")":
+            # if expression[i] == "?":
+            #     print("")
+            #     # if stack:
+            #     #     # Último paréntesis abierto
+            #     #     start = stack.pop()
+            #     #     substr = new_exp[start:]  # Extraer contenido desde el paréntesis
+            #     #     new_exp = new_exp[:start] + f"(ε|{substr})"
+            #     # else:
+            #     #     # Si no hay paréntesis, tomar el último carácter como afectado
+            #     #     new_exp = new_exp[:-1] + f"(ε|{new_exp[-1]})"
+            #     # i += 1  # Saltar el '?'
+            if expression[i] == ")":
                 # Extraer el contenido del grupo
                 start = stack.pop()
                 stack.append(start)  # Guardar de nuevo para posible `?`
@@ -75,8 +76,9 @@ class yalReader:
         for key in self.rules_tokens:
             if key in self.dicc: # remplaza los regex ya creados
                 remplazo = self.dicc[key]
-                if "?" in remplazo:
-                    remplazo = self.expand_optional(remplazo)
+                # if "?" in remplazo:
+                    # remplazo = self.expand_optional(remplazo)
+                    # remplazo = "(" + remplazo + ")?"
                 remplazo.replace("\\t", "\t")
                 remplazo.replace("\\s", "\s")
                 self.tokens[self.rules_tokens[key]] = remplazo
@@ -144,7 +146,7 @@ class yalReader:
                                 else:
                                     if expresion[i] == "\\":
                                         temps += expresion[i] + expresion[i+1]
-                                        print("!!!!!!!!"+temps)
+                                        # print("!!!!!!!!"+temps)
                                         i += 1
                                     else:
                                         temps += expresion[i]
@@ -155,7 +157,7 @@ class yalReader:
                         if expresion[i] == "]": # termina la cadena dentro de []
                             cadena = False
                             # new_exp += ")"
-                            if i+1 < len(expresion) and expresion[i+1] in self.simbols:
+                            if (i+1 < len(expresion) and (expresion[i+1] in self.simbols) ) :
                                 new_exp += "(" + temps + ")" + expresion[i+1]
                                 i += 1
                             else:
@@ -168,7 +170,7 @@ class yalReader:
                             i += 1 # me salto la primera '
                             if expresion[i] in self.simbols:
                                 new_exp += "\\"+expresion[i] # agrego \ y la letra
-                                print("!!!!!!!!!!!!!!!!!!!!!!"+ new_exp)
+                                # print("!!!!!!!!!!!!!!!!!!!!!!"+ new_exp)
                             else:
                                 new_exp +=  expresion[i]
                             i += 2 # me salto la letra y la otra '
@@ -186,9 +188,12 @@ class yalReader:
                         new_exp += "(" + self.dicc[temp] + ")"
                         if expresion[i] in self.simbols :
                             new_exp += expresion[i]
+                        if i+2 == len(expresion) and expresion[i+1] == "?":
+                            new_exp = "(" + new_exp + ")?"
+                            i += 1
                         i += 1
 
-
+            print(new_exp)
             # new_exp = new_exp.replace(".", "\.")
             self.dicc[n] = new_exp # se remplaza la expresion ya formateada en regex para su uso mas adelante
 

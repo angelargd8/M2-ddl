@@ -1,25 +1,30 @@
 import unittest
 from src.Yalex.yalReader import yalReader
 
-code = """(* Lexer para Gramática No. 1 - Expresiones aritméticas simples para variables *)
+code = """(* Lexer para Gramática No. 2 - Expresiones aritméticas extendidas *)
 
-{header}
+(* Introducir cualquier header aqui *)
 
-let delim = [' ''\t''\n']
+let delim = ['\s''\t''\n']
 let ws = delim+
 let letter = ['A'-'Z''a'-'z']
 let digit = ['0'-'9']
-let id = letter(.letter|digit)*
+let digits = digit+
+let id = letter(letter|digit)*
+let number = digits('.'digits)?('E'['+''-']?digits)?
 
-rule tokens =
-    ws        { return WHITESPACE }
-  | id        { return ID }               (* Cambie por una acción válida, que devuelva el token *)
+rule tokens = 
+    ws        { return WHITESPACE }               (* Cambie por una acción válida, que devuelva el token *)
+  | id        { return ID }
+  | number    { return NUMBER }
   | '+'       { return PLUS }
+  | '-'       { return MINUS }
   | '*'       { return TIMES }
+  | '/'       { return DIV }
   | '('       { return LPAREN }
   | ')'       { return RPAREN }
 
-{trailer}
+(* Introducir cualquier trailer aqui *)
 """
 code2 = """{header}
 let delim = [' ''\t''\n']
@@ -47,8 +52,8 @@ yal3 = yalReader("['a'-'d']")
 yal3.list.append("delim")
 yal3.dicc = {"delim": "['a'-'d']"}
 
-
-
+regex = "(((0|1|2|3|4|5|6|7|8|9))+)(\\.(((0|1|2|3|4|5|6|7|8|9))+))?(E(\\+|-)?(((0|1|2|3|4|5|6|7|8|9))+))?"
+regez = "(((0|1|2|3|4|5|6|7|8|9)+)(\\.((0|1|2|3|4|5|6|7|8|9)+))?(E(\\+|-)?((0|1|2|3|4|5|6|7|8|9)+)))?"
 yal5 = yalReader("[\"+\t\n\"]")
 yal5.list.append("delim")
 yal5.list.append("delim2")
@@ -79,6 +84,10 @@ class MyTestCase(unittest.TestCase):
 
     def test_parse4(self):
         self.assertEqual("(a|b|c|d)+a", yal5.parse())
+
+
+    def test_parse5(self):
+        yalReader(code)
 
 
 if __name__ == '__main__':

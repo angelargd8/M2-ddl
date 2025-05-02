@@ -57,9 +57,27 @@ def construirAFD(postfix):
 
 # expresion = "#bb|*a.b.b*.ab|*.#."
 # expresion = "01|2|3|4|5|6|7|8|9|+01|2|3|4|5|6|7|8|9|+?.E\+-|?.01|2|3|4|5|6|7|8|9|+.?.#."
-expresion = "(((0|1|2|3|4|5|6|7|8|9))+)(\\.(((0|1|2|3|4|5|6|7|8|9))+))?(E(\\+|-)?(((0|1|2|3|4|5|6|7|8|9))+))?"
+expresion = "(((0|1|2|3|4|5|6|7|8|9)+)(\\.((0|1|2|3|4|5|6|7|8|9)+))?(E(\\+|-)?((0|1|2|3|4|5|6|7|8|9)+)))?"
+expresion2 = "(\\s|\t|\n)+"
+expresion3 = "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*"
+plus = "\\+"
+minus = "-"
+times = "\\*"
+div = "/"
+lp = "\\("
+rp = "\\)"
 
 
 afd = construirAFD(expresion)
+afd2 = construirAFD(expresion2)
+afd3 = construirAFD(expresion3)
+afd4 = construirAFD(plus)
+afd5 = construirAFD(minus)
+afd6 = construirAFD(times)
+afd7 = construirAFD(div)
+afd8 = construirAFD(lp)
+afd9 = construirAFD(rp)
+
+
 
     # afd.mostrar()
