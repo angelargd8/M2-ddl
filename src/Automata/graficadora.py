@@ -4,7 +4,7 @@ from graphviz import Digraph
 
 def escaped_symbol(symbol):
     if symbol.startswith("\\"):
-        special_chars = {'t', 'n', 'r', 'v', '\\', '0'}
+        special_chars = {'t', 'n', 'r', 'v', '\\', '0', '\\\\', '\\\\\\'}
         if symbol[1] not in special_chars:
             return symbol[1]
         return '\\\\' + symbol[1:]

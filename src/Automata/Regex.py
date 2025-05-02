@@ -13,7 +13,7 @@ def InsertConcatenation(regex: str) -> list:
     while i < len(regex):
         #si hay un caracter escapado
         if i < len(regex) - 1 and Metachar.IsEscaped(regex[i]):
-            regexProcesada.append(f"\\\\{regex[i+1]}") #le puse 4, por como maneja python los escaspados, entonces al recibir el arbol ya tiene \\
+            regexProcesada.append(f"\\{regex[i+1]}") #le puse 2, por como maneja python los escaspados, entonces al recibir el arbol ya tiene \\
             i += 2
             continue
         elif i < len(regex) - 1 and Metachar.IsQuoted(regex[i]):
