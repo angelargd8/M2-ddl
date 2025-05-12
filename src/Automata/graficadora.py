@@ -3,13 +3,19 @@ import os
 from graphviz import Digraph
 
 def escaped_symbol(symbol):
-    if symbol.startswith("\\"):
-        special_chars = {'t', 'n', 'r', 'v', '\\', '0', '\\\\', '\\\\\\'}
-        if symbol[1] not in special_chars:
-            return symbol[1]
-        return '\\\\' + symbol[1:]
-    
-    return symbol
+    if not symbol:
+        return "ε" 
+
+    # Si solo es una barra invertida
+    if symbol == "\\":
+        return "\\\\"
+
+    # Si comienza con \ y es una secuencia de escape valida
+    if symbol.startswith("\\") and len(symbol) > 1:
+        return "\\" + symbol[1]  
+
+    # retornarlo entre comillas 
+    return symbol.replace('"', '\\"')
 
 
 def visualize_afd(afd, output_dir, file_name):
@@ -52,7 +58,8 @@ def visualize_afd(afd, output_dir, file_name):
                 destinos = [destinos]  # Convertirlo en lista
 
             for destino in destinos:
-                graph.edge(str(origen), str(destino), label=display_symbol)
+                # graph.edge(str(origen), str(destino), label=display_symbol)
+                graph.edge(str(origen), str(destino), label=f'"{display_symbol}"')
 
     output_path = os.path.join(output_dir, file_name)
     graph.render(output_path, format="png", cleanup=True)
