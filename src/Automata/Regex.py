@@ -11,6 +11,24 @@ def InsertConcatenation(regex: str) -> list:
     i = 0
 
     while i < len(regex):
+
+        #si hay un arroba
+        if regex[i] == '@':
+            j = i + 1
+            marcador = '@'
+            while j < len(regex):
+                marcador += regex[j]
+                if regex[j] == '@':
+                    regexProcesada.append(marcador)
+                    i = j + 1
+                    break
+                j += 1
+            else:
+                # Si no se cierra el marcador correctamente, lo tratamos como caracteres sueltos
+                regexProcesada.append('@')
+                i += 1
+            continue
+
         #si hay un caracter escapado
         if i < len(regex) - 1 and Metachar.IsEscaped(regex[i]):
             regexProcesada.append(f"\\{regex[i+1]}") #le puse 2, por como maneja python los escaspados, entonces al recibir el arbol ya tiene \\
@@ -39,6 +57,10 @@ def InsertConcatenation(regex: str) -> list:
 
         is_current_escaped = current.startswith('\\') if len(current) > 1 else False
         is_next_escaped = next_token.startswith('\\') if len(next_token) > 1 else False
+
+        if (current.startswith("@") and current.endswith("@")) or (next_token.startswith("@") and next_token.endswith("@")):
+            i += 1
+            continue
 
         # Evitar concatenación entre dos operadores unarios (como +?)
         if Metachar.IsUnaryOperator(current) and Metachar.IsUnaryOperator(next_token):
@@ -78,7 +100,7 @@ def InsertConcatenation(regex: str) -> list:
 #1 stack para almacernar los operadores de forma temporal por medio de su precendencia con lifo
 # 2. la output es donde se tendra la expresion regular en postfix, aqui es donde se usa la precedencia de operadores
 #
-def infixToPostfix(regex: str) -> str:
+def infixToPostfix(regex: str) -> list:
 
     if not regex:
         return ["ε"]
@@ -182,7 +204,9 @@ def infixToPostfix(regex: str) -> str:
     outputQueue.append('.')
 
 
-    result = ''.join(outputQueue)
-    print("RESULTADO: " + result)
+    # result = ''.join(outputQueue)
+    # print("RESULTADO: " + result)
+    result = list(outputQueue)
+
 
     return result

@@ -86,7 +86,10 @@ def construir_AFD(arbolSintactico, followpos):
             "^",
             "ε",
             "e",
-        ] and not simbolo.startswith("#"):
+            "·",
+        ]  and not simbolo.startswith("#")  and not (
+        simbolo.startswith("@") and simbolo.endswith("@") and simbolo[1:-1].isdigit()
+        ):
             alfabeto.add(simbolo)
     afd.alfabeto = alfabeto
 

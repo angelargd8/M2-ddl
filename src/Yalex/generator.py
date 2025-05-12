@@ -1,9 +1,10 @@
 import pickle
 import sys
 import os
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
+from src.constructor import leerArchivo
 
 from collections import defaultdict
 from typing import Dict, List
@@ -35,6 +36,29 @@ class LexicalAutomata:
     afd: AFD
     estado_a_token: Dict[int, str]
 
+def normalizar_expresion(expr: str) -> str:
+    i = 0
+    resultado = ""
+
+    while i < len(expr):
+        if expr[i] == "\\" and i + 1 < len(expr):
+            siguiente = expr[i + 1]
+
+            if siguiente == "n":
+                resultado += "\n"
+            elif siguiente == "t":
+                resultado += "\t"
+            elif siguiente == "s":
+                resultado += " "
+            else:
+                # cualquier otro escape como \+ \* \( \)
+                resultado += siguiente
+            i += 2
+        else:
+            resultado += expr[i]
+            i += 1
+
+    return resultado
 
 def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     expresiones = []
@@ -43,17 +67,29 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
 
     # Generar expresiones con finalizador único usando @idx@
     for idx, (nombre_token, expresion) in enumerate(tokens.items()):
-        expresion = expresion.replace("\\n", "\n")
-        expresion = expresion.replace("\\t", "\t")
-        expresion = expresion.replace("\\s", "\s")
+        #esto lo cambie por la funcion que esta arriba de normalizar expresion
+        # expresion = expresion.replace("\\n", "\n")
+        # expresion = expresion.replace("\\t", "\t")
+        # expresion = expresion.replace("\\s", " ") #interpretando s como espacio
+
+        expresion = normalizar_expresion(expresion)
+
         marcador = f"@{idx}@"
         expresiones.append(f"({expresion}){marcador}")
+
         token_map[str(idx)] = nombre_token
+
 
     expresion_global = "|".join(expresiones)
     logger.info(f"Expresión global: {expresion_global}")
 
+
     postfix = infixToPostfix(expresion_global)
+    print("\n--- POSTFIX TOKENS ---")
+    # for t in postfix:
+    #     print(t)
+    print(f"Postfix: {postfix}")
+
     logger.info(f"POSTFIX global: {postfix}")
 
     arbol = construirArbolSintactico(postfix)
@@ -69,6 +105,7 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     while i < len(sorted_positions):
         pos = sorted_positions[i]
         simbolo = posicion_a_simbolo[pos]
+
 
         if simbolo == "@":
             num_str = ""
@@ -103,6 +140,13 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     # afd.mostrar()
     visualize_afd(afd, output_dir=OUTPUT_DIR, file_name="AFD_Unificado")
 
+    print("\nSímbolos en transiciones del AFD:")
+    for origen, trans in afd.transiciones.items():
+        for simbolo in trans:
+            print(f"  {origen} -- {repr(simbolo)} --> {trans[simbolo]}")
+
+    # return LexicalAutomata(afd=afd, estado_a_token=estado_a_token)
+
     return LexicalAutomata(afd=afd, estado_a_token=estado_a_token)
 
 
@@ -128,9 +172,8 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
         while j < len(texto):
             c = texto[j]
             transiciones = automata.afd.transiciones.get(estado_actual, {})
-
-            if c in {"+", "(", ")", "*", "."}:
-                c = "\\" + c
+            # if c in {"+", "*", "(", ")", ".", "\\", "?", "-", "[", "]", "{", "}", "^", "$"}:
+            #     c = "\\" + c
             if c in transiciones:
                 estado_actual = transiciones[c]
                 j += 1
@@ -143,7 +186,8 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
 
         if ultimo_estado_final is not None:
             lexema = texto[i:ultima_pos_final]
-            resultados.append([lexema, token_encontrado])
+            if token_encontrado != "WHITESPACE":
+                resultados.append([lexema, token_encontrado])
             i = ultima_pos_final
         else:
             resultados.append([texto[i], "ERROR"])
@@ -152,33 +196,33 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
     return resultados
 
 
-def leerArchivo(ruta):
-    try:
-        with open(ruta, "r", encoding="utf-8") as archivo:
-            return archivo.read()
-    except Exception as e:
-        print(f"Error al leer {ruta}: {e}")
-        return None
-
-
-ruta = "C://Users//pablo//OneDrive - UVG//Escritorio//UVG//7mo Semestre//Diseño de lenguajes de Programacion//Modulo 2//Fase de Compilacion//M2-ddl//src//Test.txt"
+ruta = "./Test.txt"
 
 texto_prueba = leerArchivo(ruta)
+
+if texto_prueba is None:
+    print(f"Error al leer el archivo {ruta}. Asegúrate de que existe y es accesible.")
+    sys.exit(1)
 
 # "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
 # ((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*a
 tokens = {
     "WHITESPACE": "( |\\t|\\n)+",
+    # "ID": "([a-zA-Z])([a-zA-Z0-9_])*",
     "ID": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*",
-    # "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(\\.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
+    # "NUMBER": "([0-9])+((\\.([0-9])+)?)(E((\\+|-)?([0-9])+))?",
+    "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(\\.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
+    "ASSIGNOP": ":=",
     "PLUS": "\\+",
     "MINUS": "-",
     "TIMES": "\\*",
     "DIV": "/",
+    "LT": "<",
+    "EQ": "=",
+    "SEMICOLON": ";",
     "LPAREN": "\\(",
-    "RPAREN": "\\)",
+    "RPAREN": "\\)"
 }
-
 
 lexical_automata = generar_afd_unificado(tokens)
 _serialize_automata(lexical_automata, "lexical_out")

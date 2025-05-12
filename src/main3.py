@@ -23,7 +23,7 @@ def leerArchivo(file: str) -> Union[List[str], str]:
 
 def construirAFD(postfix):
     # construir el arbol sintactico para la cadena
-    print('procesando la expresion postfix: ' + postfix)
+    print('procesando la expresion postfix: ' + str(postfix))
     postfixTokenizado = tokenize_postfix(postfix)
 
     ArbolSintactico = construirArbolSintactico(postfixTokenizado)
@@ -82,7 +82,7 @@ afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion8)
 afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion9)
 
 
-visualize_afd(afd, output_dir="Visual", file_name=f"AFD")
+visualize_afd(afd, output_dir="Visuall", file_name=f"AFD")
 
 # afd.mostrar()
 

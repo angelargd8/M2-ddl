@@ -1,5 +1,7 @@
 from Automata.Node import *
 from Automata.metachar import Metachar
+from typing import List, Union
+
 
 #arbol sintactico
 #1. preparar stack vacio
@@ -9,11 +11,45 @@ from Automata.metachar import Metachar
 #funciones del arbol sintactico
 #anulable, primerapos, ultimapos, siguientepos
 
-def tokenize_postfix(postfix: str) -> list:
+def tokenize_postfix(postfix: Union[str, list]) -> list:
+
+    if isinstance(postfix, str):
+        postfix = list(postfix)
+
     tokens = []
     i = 0
     while i < len(postfix):
 
+        if postfix[i] == '@':
+            marcador = '@'
+            j = i + 1
+            while j < len(postfix):
+                marcador += postfix[j]
+                if postfix[j] == '@':
+                    tokens.append(marcador)
+                    i = j + 1
+                    break
+                j += 1
+            else:
+                tokens.append('@')
+                i += 1
+            continue
+
+        if postfix[i] == '[':
+            grupo = '['
+            j = i + 1
+            while j < len(postfix):
+                grupo += postfix[j]
+                if postfix[j] == ']':
+                    tokens.append(grupo)
+                    i = j + 1
+                    break
+                j += 1
+            else:
+                # No se cerró bien el grupo, tratamos carácter por carácter
+                tokens.append('[')
+                i += 1
+            continue
 
         #manejo de caracteres escapados
         if postfix[i] == "\\":
@@ -58,12 +94,12 @@ def tokenize_postfix(postfix: str) -> list:
     return tokens
 
 
-def construirArbolSintactico(tokens: str) -> Node:
+def construirArbolSintactico(tokens: Union[str, List[str]]) -> Node:
     # funcion recursiva de backtracking para construir el arbol sintactico
     def backtrack(index):
         # print("index: " + str(index))
         token = tokens[index]
-        print(f"////////// token '{token}'")
+        # print(f"////////// token '{token}'")
 
         #no es un operador, puede ser epsilon o un literal
         if not Metachar.IsBinaryOperator(token) and not Metachar.IsUnaryOperator(token):
@@ -112,7 +148,7 @@ def construirArbolSintactico(tokens: str) -> Node:
     
     raiz, _ = backtrack(len(tokens) - 1)
     print("===ARBOL SINTACTICO CONSTRUIDO===")
-    print("Raiz: " + str(raiz.displayValue()))
+    # print("Raiz: " + str(raiz.displayValue()))
     return raiz
 
 
