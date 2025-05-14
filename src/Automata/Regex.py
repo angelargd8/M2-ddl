@@ -34,6 +34,7 @@ def InsertConcatenation(regex: str) -> list:
             regexProcesada.append(f"\\{regex[i+1]}") #le puse 2, por como maneja python los escaspados, entonces al recibir el arbol ya tiene \\
             i += 2
             continue
+        #literales entre comillas
         elif i < len(regex) - 1 and Metachar.IsQuoted(regex[i]):
             regexProcesada.append(f"{regex[i]}{regex[i+1]}{regex[i+2]}")
             i += 3
@@ -60,6 +61,7 @@ def InsertConcatenation(regex: str) -> list:
 
         if (current.startswith("@") and current.endswith("@")) or (next_token.startswith("@") and next_token.endswith("@")):
             i += 1
+            result.append('.')
             continue
 
         # Evitar concatenación entre dos operadores unarios (como +?)

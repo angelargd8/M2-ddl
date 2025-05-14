@@ -72,6 +72,7 @@ expresion1 = infixToPostfix(token1)
 # expresion8 = infixToPostfix(token8)
 # expresion9 = infixToPostfix(token9)
 
+# expresion1 = ['0', '1', '|', '2', '|', '3', '|', '4', '|', '5', '|', '6', '|', '7', '|', '8', '|', '9', '|', '+', '@0@','.', '#', '.']
 
 afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion1)
 # afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion2)

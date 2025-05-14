@@ -95,6 +95,7 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     logger.info(f"POSTFIX global: {postfix}")
 
     arbol = construirArbolSintactico(postfix)
+    print("------------árbol sintáctico---------")
     imprimirArbolSintactico(arbol, "", True)
     followpos = defaultdict(set)
     calcular_followPos(arbol, followpos)
