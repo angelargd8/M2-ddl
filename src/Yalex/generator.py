@@ -163,9 +163,11 @@ def _serialize_automata(automata: LexicalAutomata, output_name: str):
     logger.info(f"Automata serializado en {pickle_file_path}")
 
 
+#REVISAR ESTA FUNCION
 def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
     resultados = []
     i = 0
+
     while i < len(texto):
         estado_actual = automata.afd.estado_inicial
         j = i
@@ -222,8 +224,8 @@ tokens = {
 #     "TIMES": "\\*",
 #     "DIV": "/",
 #     "LT": "<",
-#     "EQ": "=",
-#     "SEMICOLON": ";",
+    # "EQ": "=",
+    # "SEMICOLON": ";",
 #     "LPAREN": "\\(",
 #     "RPAREN": "\\)"
 # }
@@ -238,6 +240,6 @@ _serialize_automata(lexical_automata, "lexical_out")
 print("\nContenido de Test.txt: \n")
 print(texto_prueba)
 
-
+print("\n--- SIMULANDO texto ---")
 resultado = simular_texto(texto_prueba, lexical_automata)
 print(resultado)
