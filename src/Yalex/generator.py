@@ -9,7 +9,7 @@ from src.constructor import leerArchivo
 from collections import defaultdict
 from typing import Dict, List
 from dataclasses import dataclass
-from Automata.arboles import construirArbolSintactico
+from Automata.arboles import construirArbolSintactico, imprimirArbolSintactico
 from Automata.Regex import infixToPostfix
 from Automata.AFD import AFD, construir_AFD
 from Automata.Node import calcular_followPos
@@ -79,20 +79,23 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
 
         token_map[str(idx)] = nombre_token
 
+    print("\n--- TOKEN MAP ---")
+    print(token_map)
 
     expresion_global = "|".join(expresiones)
+    print("\n--- EXPRESION GLOBAL ---")
+    print(expresion_global)
     logger.info(f"Expresión global: {expresion_global}")
 
 
     postfix = infixToPostfix(expresion_global)
     print("\n--- POSTFIX TOKENS ---")
-    # for t in postfix:
-    #     print(t)
     print(f"Postfix: {postfix}")
 
     logger.info(f"POSTFIX global: {postfix}")
 
     arbol = construirArbolSintactico(postfix)
+    imprimirArbolSintactico(arbol, "", True)
     followpos = defaultdict(set)
     calcular_followPos(arbol, followpos)
 
@@ -205,23 +208,27 @@ if texto_prueba is None:
     sys.exit(1)
 
 # "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
-# ((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*a
+# ((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*
 tokens = {
-    "WHITESPACE": "( |\\t|\\n)+",
-    # "ID": "([a-zA-Z])([a-zA-Z0-9_])*",
-    "ID": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*",
-    # "NUMBER": "([0-9])+((\\.([0-9])+)?)(E((\\+|-)?([0-9])+))?",
-    "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(\\.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
-    "ASSIGNOP": ":=",
-    "PLUS": "\\+",
-    "MINUS": "-",
-    "TIMES": "\\*",
-    "DIV": "/",
-    "LT": "<",
-    "EQ": "=",
-    "SEMICOLON": ";",
-    "LPAREN": "\\(",
-    "RPAREN": "\\)"
+#     "WHITESPACE": "( |\\t|\\n)+",
+#     # "ID": "([a-zA-Z])([a-zA-Z0-9_])*",
+#     "ID": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*",
+#     # "NUMBER": "([0-9])+((\\.([0-9])+)?)(E((\\+|-)?([0-9])+))?",
+#     "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(\\.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
+#     "ASSIGNOP": ":=",
+#     "PLUS": "\\+",
+#     "MINUS": "-",
+#     "TIMES": "\\*",
+#     "DIV": "/",
+#     "LT": "<",
+#     "EQ": "=",
+#     "SEMICOLON": ";",
+#     "LPAREN": "\\(",
+#     "RPAREN": "\\)"
+# }
+    # "RPAREN": "\\)",
+    "NUMBER" : "((0|1|2|3|4|5|6|7|8|9)+)",
+    # "LPAREN": "\\(",
 }
 
 lexical_automata = generar_afd_unificado(tokens)

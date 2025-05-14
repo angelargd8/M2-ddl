@@ -26,6 +26,8 @@ def construirAFD(postfix):
     print('procesando la expresion postfix: ' + str(postfix))
     postfixTokenizado = tokenize_postfix(postfix)
 
+    print("postfix tokenizado: ", postfixTokenizado)
+
     ArbolSintactico = construirArbolSintactico(postfixTokenizado)
 
     if ArbolSintactico:
@@ -61,25 +63,25 @@ token8 = "\\("
 token9 = "\\)"
 
 expresion1 = infixToPostfix(token1)
-expresion2 = infixToPostfix(token2)
-expresion3 = infixToPostfix(token3)
-expresion4 = infixToPostfix(token4)
-expresion5 = infixToPostfix(token5)
-expresion6 = infixToPostfix(token6)
-expresion7 = infixToPostfix(token7)
-expresion8 = infixToPostfix(token8)
-expresion9 = infixToPostfix(token9)
+# expresion2 = infixToPostfix(token2)
+# expresion3 = infixToPostfix(token3)
+# expresion4 = infixToPostfix(token4)
+# expresion5 = infixToPostfix(token5)
+# expresion6 = infixToPostfix(token6)
+# expresion7 = infixToPostfix(token7)
+# expresion8 = infixToPostfix(token8)
+# expresion9 = infixToPostfix(token9)
 
 
 afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion1)
-afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion2)
-afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion3)
-afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion4)
-afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion5)
-afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion6)
-afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion7)
-afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion8)
-afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion9)
+# afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion2)
+# afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion3)
+# afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion4)
+# afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion5)
+# afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion6)
+# afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion7)
+# afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion8)
+# afd , estados_dict , estado_id_a_conjunto =construirAFD(expresion9)
 
 
 visualize_afd(afd, output_dir="Visuall", file_name=f"AFD")
