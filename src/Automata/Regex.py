@@ -63,9 +63,9 @@ def InsertConcatenation(regex: str) -> list:
         current = regexProcesada[i]
         next_token = regexProcesada[i + 1]
 
-        print("- CURRENT " + current )
-        print("- NEXT " + next_token )
-        print("//// ///////////")
+        # print("- CURRENT " + current )
+        # print("- NEXT " + next_token )
+        # print("//// ///////////")
         result.append(current)
 
         is_current_escaped = current.startswith('\\') if len(current) > 1 else False
@@ -94,7 +94,7 @@ def InsertConcatenation(regex: str) -> list:
                 ):
 
                 result.append('.')
-                print("actual" + "".join(result))
+                # print("actual" + "".join(result))
 
         i += 1
         continue
@@ -126,7 +126,7 @@ def infixToPostfix(regex: str) -> list:
     #agregar la concatenacion a la expresion regular
     # tokens = list("(((0|1|2|3|4|5|6|7|8|9))+).((((0|1|2|3|4|5|6|7|8|9))+))?.(E.(\+|-)?.(((0|1|2|3|4|5|6|7|8|9))+))?")
     tokens = InsertConcatenation(regex)
-    print("----> REGEX CONCATEANDO: " + str(tokens))
+    # print("----> REGEX CONCATEANDO: " + str(tokens))
 
     operatorStack = [] # stack para los operadores
     outputQueue = deque() # cola para la salida
@@ -139,15 +139,15 @@ def infixToPostfix(regex: str) -> list:
     #recorrer la lista de tokens
     while i < len(tokens):
         token = tokens[i]
-        print("=========================================== " )
-        print("TOKEN: " + str(token))
-        print("- output queue: "+ str(outputQueue))
-        print("- Operator stack:" +str(operatorStack))
+        # print("=========================================== " )
+        # print("TOKEN: " + str(token))
+        # print("- output queue: "+ str(outputQueue))
+        # print("- Operator stack:" +str(operatorStack))
 
         #verificar si es un operador
         if len(token) == 1 and Metachar.HasPrecedence(token):
 
-            print("-----PRECEDENCIA: " + str(Metachar.precedence[token]) + "-----")
+            # print("-----PRECEDENCIA: " + str(Metachar.precedence[token]) + "-----")
 
             if Metachar.precedence[token] == 0: # (
                 operatorStack.append(token)
@@ -159,7 +159,7 @@ def infixToPostfix(regex: str) -> list:
 
                 #saccar los operadores hasta encontrar los parentesis izquierdo
                 while operatorStack and Metachar.precedence[operatorStack[-1]] != 0:
-                    print("////OPERADORES ////")
+                    # print("////OPERADORES ////")
                     outputQueue.append(operatorStack.pop())
         
 
@@ -201,7 +201,7 @@ def infixToPostfix(regex: str) -> list:
                 # i += 1
                 # continue
         else:
-            print("-----NO ES UN OPERADOR-----")
+            # print("-----NO ES UN OPERADOR-----")
             #es un operando o un caracter escapado, se agrega a la salida
             outputQueue.append(token)
         i += 1

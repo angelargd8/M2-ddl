@@ -89,9 +89,7 @@ def construir_AFD(arbolSintactico, followpos):
         # 1 . instanciar AFD
         afd = AFD()
 
-        # # 2. mapear posiciones a simbolos
-        # posicion_a_simbolo = {}
-        # mapear_posiciones_simbolos(arbolSintactico, posicion_a_simbolo)
+
     # 1. Mapear posiciones a símbolos
     posicion_a_simbolo = {}
     mapear_posiciones_simbolos(arbolSintactico, posicion_a_simbolo)
@@ -105,8 +103,8 @@ def construir_AFD(arbolSintactico, followpos):
             alfabeto.add(simbolo)
 
     afd.alfabeto = alfabeto
-    print("---ALFABETO---")
-    print(afd.alfabeto)
+    # print("---ALFABETO---")
+    # print(afd.alfabeto)
 
     # 3. Estado inicial: conjunto firstpos de la raíz
     estado_inicial = frozenset(arbolSintactico.firstpos)

@@ -37,13 +37,16 @@ for archivo_yal in archivos:
         lexical_automata = generar_afd_unificado(tokens)
         _serialize_automata(lexical_automata, "lexical_out")
 
-        print("\nContenido de Test.txt: \n")
-        print(texto_prueba)
 
         print("\n--- SIMULANDO texto ---")
         resultado = simular_texto(texto_prueba, lexical_automata)
-        for i in resultado:
-            print(i)
+        ruta_salida = "./out/resultado.txt"  # Puedes cambiar esta ruta
+        os.makedirs(os.path.dirname(ruta_salida), exist_ok=True)
+        with open(ruta_salida, "w", encoding="utf-8") as archivo:
+            for i in resultado:
+                archivo.write(str(i) + "\n")  # Asegura que cada resultado esté en una línea
+
+        print(f"\nResultado guardado correctamente en: {ruta_salida}")
 
 
 

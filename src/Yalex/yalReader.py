@@ -76,11 +76,9 @@ class yalReader:
         for key in self.rules_tokens:
             if key in self.dicc: # remplaza los regex ya creados
                 remplazo = self.dicc[key]
-                # if "?" in remplazo:
-                    # remplazo = self.expand_optional(remplazo)
-                    # remplazo = "(" + remplazo + ")?"
-                remplazo.replace("\\t", "\t")
-                remplazo.replace("\\s", "\s")
+                # Reemplazo explícito de secuencias como \\n -> \n, \\t -> \t
+                remplazo = remplazo.replace("\\n", "\n").replace("\\t", "\t").replace("\\s", " ")
+
                 self.tokens[self.rules_tokens[key]] = remplazo
             else: # si no es regex jalar solo el valor que tiene
                 key = key.strip()
@@ -94,6 +92,8 @@ class yalReader:
                         else:
                             temp += key[j]
                         j += 1
+                    temp = temp.replace("\\n", "\n").replace("\\t", "\t").replace("\\s", " ")
+
                     self.tokens[self.rules_tokens[key]] = temp
                 else:
                     if key[1] in self.simbols:
