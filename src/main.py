@@ -12,7 +12,7 @@ from Yalex.generator import generar_afd_unificado, simular_texto, _serialize_aut
 import os
 
 
-archivos = ["slr-4.yal"]  # Lista de archivos YAL
+archivos = ["slr-2.yal"]  # Lista de archivos YAL
 
 for archivo_yal in archivos:
     ruta = os.path.join("./Yalex/yalDocs/", archivo_yal)
@@ -23,7 +23,7 @@ for archivo_yal in archivos:
 
         yal = yalReader(contenido_yal)
         tokens = yal.get_tokens()
-        texto_prueba = leerArchivo("./random_data.txt")
+        texto_prueba = leerArchivo("./random_data_2.txt")
 
         print("Tokens detectados:")
         for nombre, expr in tokens.items():
@@ -40,11 +40,12 @@ for archivo_yal in archivos:
 
         print("\n--- SIMULANDO texto ---")
         resultado = simular_texto(texto_prueba, lexical_automata)
+
         ruta_salida = "./out/resultado.txt"  # Puedes cambiar esta ruta
         os.makedirs(os.path.dirname(ruta_salida), exist_ok=True)
         with open(ruta_salida, "w", encoding="utf-8") as archivo:
-            for i in resultado:
-                archivo.write(str(i) + "\n")  # Asegura que cada resultado esté en una línea
+            for i, j in resultado:
+                archivo.write(f"{i} -> {j}\n") # Asegura que cada resultado esté en una línea
 
         print(f"\nResultado guardado correctamente en: {ruta_salida}")
 
