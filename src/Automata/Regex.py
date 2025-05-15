@@ -13,21 +13,33 @@ def InsertConcatenation(regex: str) -> list:
     while i < len(regex):
 
         #si hay un arroba
-        if regex[i] == '@':
+        # if regex[i] == '@':
+        #     j = i + 1
+        #     marcador = '@'
+        #     while j < len(regex):
+        #         marcador += regex[j]
+        #         if regex[j] == '@':
+        #             regexProcesada.append(marcador)
+        #             i = j + 1
+        #             break
+        #         j += 1
+        #     else:
+        #         # Si no se cierra el marcador correctamente, lo tratamos como caracteres sueltos
+        #         regexProcesada.append('@')
+        #         i += 1
+        #     continue
+
+        # Manejar marcadores del tipo #0, #1, etc.
+        if regex[i] == '#' and i + 1 < len(regex) and regex[i+1].isdigit():
             j = i + 1
-            marcador = '@'
-            while j < len(regex):
+            marcador = '#'
+            while j < len(regex) and regex[j].isdigit():
                 marcador += regex[j]
-                if regex[j] == '@':
-                    regexProcesada.append(marcador)
-                    i = j + 1
-                    break
                 j += 1
-            else:
-                # Si no se cierra el marcador correctamente, lo tratamos como caracteres sueltos
-                regexProcesada.append('@')
-                i += 1
+            regexProcesada.append(marcador)
+            i = j
             continue
+
 
         #si hay un caracter escapado
         if i < len(regex) - 1 and Metachar.IsEscaped(regex[i]):
@@ -59,10 +71,10 @@ def InsertConcatenation(regex: str) -> list:
         is_current_escaped = current.startswith('\\') if len(current) > 1 else False
         is_next_escaped = next_token.startswith('\\') if len(next_token) > 1 else False
 
-        if (current.startswith("@") and current.endswith("@")) or (next_token.startswith("@") and next_token.endswith("@")):
-            i += 1
-            result.append('.')
-            continue
+        # if (current.startswith("@") and current.endswith("@")) or (next_token.startswith("@") and next_token.endswith("@")):
+        #     i += 1
+        #     result.append('.')
+        #     continue
 
         # Evitar concatenación entre dos operadores unarios (como +?)
         if Metachar.IsUnaryOperator(current) and Metachar.IsUnaryOperator(next_token):

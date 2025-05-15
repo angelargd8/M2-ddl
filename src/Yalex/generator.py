@@ -26,8 +26,7 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-# Carpeta de salida
-OUTPUT_DIR = "../src/Yalex/generatorAFDS"
+OUTPUT_DIR = "./src/Yalex/generatorAFDS"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
@@ -43,7 +42,6 @@ def normalizar_expresion(expr: str) -> str:
     while i < len(expr):
         if expr[i] == "\\" and i + 1 < len(expr):
             siguiente = expr[i + 1]
-
             if siguiente == "n":
                 resultado += "\n"
             elif siguiente == "t":
@@ -65,19 +63,12 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     posicion_a_token = {}
     token_map = {}
 
-    # Generar expresiones con finalizador único usando @idx@
+    # Generar expresiones con finalizador único usando #idx
     for idx, (nombre_token, expresion) in enumerate(tokens.items()):
-        #esto lo cambie por la funcion que esta arriba de normalizar expresion
-        # expresion = expresion.replace("\\n", "\n")
-        # expresion = expresion.replace("\\t", "\t")
-        # expresion = expresion.replace("\\s", " ") #interpretando s como espacio
-
         expresion = normalizar_expresion(expresion)
-
-        marcador = f"@{idx}@"
+        marcador = f"#{idx}"
         expresiones.append(f"({expresion}){marcador}")
-
-        token_map[str(idx)] = nombre_token
+        token_map[marcador] = nombre_token
 
     print("\n--- TOKEN MAP ---")
     print(token_map)
@@ -91,45 +82,22 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
     postfix = infixToPostfix(expresion_global)
     print("\n--- POSTFIX TOKENS ---")
     print(f"Postfix: {postfix}")
-
     logger.info(f"POSTFIX global: {postfix}")
 
     arbol = construirArbolSintactico(postfix)
     print("------------árbol sintáctico---------")
     imprimirArbolSintactico(arbol, "", True)
+
     followpos = defaultdict(set)
     calcular_followPos(arbol, followpos)
 
     posicion_a_simbolo = {}
     mapear_posiciones_simbolos(arbol, posicion_a_simbolo)
 
-    # Detectar fragmentos @idx@ en la secuencia de símbolos
-    sorted_positions = sorted(posicion_a_simbolo.keys())
-    i = 0
-    while i < len(sorted_positions):
-        pos = sorted_positions[i]
-        simbolo = posicion_a_simbolo[pos]
-
-
-        if simbolo == "@":
-            num_str = ""
-            j = i + 1
-            while j < len(sorted_positions):
-                next_pos = sorted_positions[j]
-                next_char = posicion_a_simbolo[next_pos]
-                if next_char.isdigit():
-                    num_str += next_char
-                    j += 1
-                elif next_char == "@":
-                    idx = num_str
-                    if idx in token_map:
-                        # Mapear el primer '@' a su token
-                        posicion_a_token[pos] = token_map[idx]
-                    i = j  # saltar al segundo '@'
-                    break
-                else:
-                    break  # No es un marcador válido
-        i += 1
+    # Mapear las posiciones finales con marcador #i a su token correspondiente
+    for pos, simbolo in posicion_a_simbolo.items():
+        if simbolo in token_map:
+            posicion_a_token[pos] = token_map[simbolo]
 
     afd, estados_dict, estado_id_a_conjunto = construir_AFD(arbol, followpos)
 
@@ -141,7 +109,6 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
                 estado_a_token[estado_id] = posicion_a_token[pos]
                 afd.agregar_estado_final(estado_id)
 
-    # afd.mostrar()
     visualize_afd(afd, output_dir=OUTPUT_DIR, file_name="AFD_Unificado")
 
     print("\nSímbolos en transiciones del AFD:")
@@ -149,10 +116,7 @@ def generar_afd_unificado(tokens: Dict[str, str]) -> LexicalAutomata:
         for simbolo in trans:
             print(f"  {origen} -- {repr(simbolo)} --> {trans[simbolo]}")
 
-    # return LexicalAutomata(afd=afd, estado_a_token=estado_a_token)
-
     return LexicalAutomata(afd=afd, estado_a_token=estado_a_token)
-
 
 def _serialize_automata(automata: LexicalAutomata, output_name: str):
     new_dir = os.path.join(OUTPUT_DIR, output_name)
@@ -162,8 +126,6 @@ def _serialize_automata(automata: LexicalAutomata, output_name: str):
         pickle.dump(automata, f)
     logger.info(f"Automata serializado en {pickle_file_path}")
 
-
-#REVISAR ESTA FUNCION
 def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
     resultados = []
     i = 0
@@ -178,8 +140,6 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
         while j < len(texto):
             c = texto[j]
             transiciones = automata.afd.transiciones.get(estado_actual, {})
-            # if c in {"+", "*", "(", ")", ".", "\\", "?", "-", "[", "]", "{", "}", "^", "$"}:
-            #     c = "\\" + c
             if c in transiciones:
                 estado_actual = transiciones[c]
                 j += 1
@@ -201,37 +161,28 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
 
     return resultados
 
+# === MAIN ===
 
 ruta = "./Test.txt"
-
 texto_prueba = leerArchivo(ruta)
 
 if texto_prueba is None:
     print(f"Error al leer el archivo {ruta}. Asegúrate de que existe y es accesible.")
     sys.exit(1)
 
-# "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
-# ((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*
 tokens = {
-#     "WHITESPACE": "( |\\t|\\n)+",
-#     # "ID": "([a-zA-Z])([a-zA-Z0-9_])*",
-#     "ID": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*",
-#     # "NUMBER": "([0-9])+((\\.([0-9])+)?)(E((\\+|-)?([0-9])+))?",
-#     "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)(\\.((ε|(0|1|2|3|4|5|6|7|8|9)+)))(E(ε|(\\+|-))((ε|(0|1|2|3|4|5|6|7|8|9)+)))",
-#     "ASSIGNOP": ":=",
-#     "PLUS": "\\+",
-#     "MINUS": "-",
-#     "TIMES": "\\*",
-#     "DIV": "/",
-#     "LT": "<",
-    # "EQ": "=",
-    # "SEMICOLON": ";",
-#     "LPAREN": "\\(",
-#     "RPAREN": "\\)"
-# }
-    # "RPAREN": "\\)",
-    "NUMBER" : "((0|1|2|3|4|5|6|7|8|9)+)",
-    # "LPAREN": "\\(",
+    "NUMBER": "((0|1|2|3|4|5|6|7|8|9)+)",
+    "WORD": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)+",
+    "WS": "( |\\t|\\n)+",
+    "COND" : "if|else|while|for|return",
+    "EQUAL": "=",
+    # "PLUS": "+",
+    "MINUS": "-",
+    # "LPAREN": "(",
+    # "RPAREN": ")",
+    "LBRACE": "\\{",
+    "RBRACE": "\\}",
+    # "MULT": "*",
 }
 
 lexical_automata = generar_afd_unificado(tokens)
