@@ -40,6 +40,7 @@ class AFD:
         )
 
 
+
 def mapear_posiciones_simbolos(nodo, posicion_a_simbolo):
     # si el nodo es None, terminar la función y retornar
     if nodo is None:
@@ -60,6 +61,27 @@ def mapear_posiciones_simbolos(nodo, posicion_a_simbolo):
     mapear_posiciones_simbolos(nodo.right, posicion_a_simbolo)
 
 
+def procesar_escapado(cadena):
+    especiales = "+*|()[]?'#."
+
+    if cadena[-1] not in especiales:
+        return cadena
+    else:
+        resultado = ""
+        i = 0
+
+        while i < len(cadena):
+            if cadena[i] == "\\" and i + 1 < len(cadena) and cadena[i + 1] in especiales:
+                resultado += cadena[i + 1]  # Agrega solo el carácter especial sin el '\'
+                i += 2  # Salta ambos caracteres
+            else:
+                resultado += cadena[i]
+                i += 1
+
+        return resultado
+
+
+
 def construir_AFD(arbolSintactico, followpos):
 
     if arbolSintactico:
@@ -67,9 +89,9 @@ def construir_AFD(arbolSintactico, followpos):
         # 1 . instanciar AFD
         afd = AFD()
 
-        # 2. mapear posiciones a simbolos
-        posicion_a_simbolo = {}
-        mapear_posiciones_simbolos(arbolSintactico, posicion_a_simbolo)
+        # # 2. mapear posiciones a simbolos
+        # posicion_a_simbolo = {}
+        # mapear_posiciones_simbolos(arbolSintactico, posicion_a_simbolo)
     # 1. Mapear posiciones a símbolos
     posicion_a_simbolo = {}
     mapear_posiciones_simbolos(arbolSintactico, posicion_a_simbolo)
@@ -77,21 +99,14 @@ def construir_AFD(arbolSintactico, followpos):
     # 2. Alfabeto sin operadores especiales
     alfabeto = set()
     for simbolo in posicion_a_simbolo.values():
-        if simbolo not in [
-            "*",
-            "+",
-            ".",
-            "|",
-            "#",
-            "^",
-            "ε",
-            "e",
-            "·",
-        ]  and not simbolo.startswith("#")  and not (
-        simbolo.startswith("@") and simbolo.endswith("@") and simbolo[1:-1].isdigit()
+        if not simbolo.startswith("#") and not (
+                simbolo.startswith("@") and simbolo.endswith("@") and simbolo[1:-1].isdigit()
         ):
             alfabeto.add(simbolo)
+
     afd.alfabeto = alfabeto
+    print("---ALFABETO---")
+    print(afd.alfabeto)
 
     # 3. Estado inicial: conjunto firstpos de la raíz
     estado_inicial = frozenset(arbolSintactico.firstpos)
@@ -127,7 +142,7 @@ def construir_AFD(arbolSintactico, followpos):
                     id_counter += 1
 
                 afd.agregar_transiciones(
-                    id_actual, simbolo, estados_dict[nuevo_estado_frozen]
+                    id_actual, procesar_escapado(simbolo), estados_dict[nuevo_estado_frozen]
                 )
 
     return afd, estados_dict, estado_id_a_conjunto

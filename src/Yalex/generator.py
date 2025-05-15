@@ -25,7 +25,6 @@ file_handler = logging.FileHandler("afd_generation.log")
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
-
 OUTPUT_DIR = "./src/Yalex/generatorAFDS"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -38,23 +37,27 @@ class LexicalAutomata:
 def normalizar_expresion(expr: str) -> str:
     i = 0
     resultado = ""
+    simbols = "+*|()[]?'#."
+    if expr[-1] not in simbols:
+        while i < len(expr):
+            if expr[i] == "\\" and i + 1 < len(expr):
+                siguiente = expr[i + 1]
+                if siguiente == "n":
+                    resultado += "\n"
+                elif siguiente == "t":
+                    resultado += "\t"
+                elif siguiente == "s":
+                    resultado += " "
 
-    while i < len(expr):
-        if expr[i] == "\\" and i + 1 < len(expr):
-            siguiente = expr[i + 1]
-            if siguiente == "n":
-                resultado += "\n"
-            elif siguiente == "t":
-                resultado += "\t"
-            elif siguiente == "s":
-                resultado += " "
+                else:
+                    # cualquier otro escape como \+ \* \( \)
+                    resultado += siguiente
+                i += 2
             else:
-                # cualquier otro escape como \+ \* \( \)
-                resultado += siguiente
-            i += 2
-        else:
-            resultado += expr[i]
-            i += 1
+                resultado += expr[i]
+                i += 1
+    else:
+        resultado = expr
 
     return resultado
 
@@ -175,14 +178,15 @@ tokens = {
     "WORD": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)+",
     "WS": "( |\\t|\\n)+",
     "COND" : "if|else|while|for|return",
+    "ID": "((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*)",
     "EQUAL": "=",
-    # "PLUS": "+",
+    "PLUS": "\\+",
     "MINUS": "-",
-    # "LPAREN": "(",
-    # "RPAREN": ")",
+    "LPAREN": "\\(",
+    "RPAREN": "\\)",
     "LBRACE": "\\{",
     "RBRACE": "\\}",
-    # "MULT": "*",
+    "MULT": "\\*",
 }
 
 lexical_automata = generar_afd_unificado(tokens)
