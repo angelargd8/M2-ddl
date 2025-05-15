@@ -23,7 +23,7 @@ for archivo_yal in archivos:
 
         yal = yalReader(contenido_yal)
         tokens = yal.get_tokens()
-        texto_prueba = leerArchivo("./Test.txt")
+        texto_prueba = leerArchivo("./random_data.txt")
 
         print("Tokens detectados:")
         for nombre, expr in tokens.items():
