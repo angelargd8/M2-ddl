@@ -43,4 +43,4 @@ class Metachar:
 
     @staticmethod
     def IsEpsilon(char):
-        return char in {'ε', 'Epsilon', 'e', 'E'}
+        return char in {'ε', 'Epsilon'}

@@ -12,7 +12,7 @@ from Yalex.generator import generar_afd_unificado, simular_texto, _serialize_aut
 import os
 
 
-archivos = ["slr-2.yal"]  # Lista de archivos YAL
+archivos = ["slr-4.yal"]  # Lista de archivos YAL
 
 for archivo_yal in archivos:
     ruta = os.path.join("./Yalex/yalDocs/", archivo_yal)
@@ -30,20 +30,21 @@ for archivo_yal in archivos:
             print(f"  {nombre}: {expr}")
 
 
-        # if texto_prueba is None:
-        #     print(f"Error al leer el archivo {ruta}. Asegúrate de que existe y es accesible.")
-        #     sys.exit(1)
-        #
-        # lexical_automata = generar_afd_unificado(tokens)
-        # _serialize_automata(lexical_automata, "lexical_out")
-        #
-        # print("\nContenido de Test.txt: \n")
-        # print(texto_prueba)
-        #
-        # print("\n--- SIMULANDO texto ---")
-        # resultado = simular_texto(texto_prueba, lexical_automata)
-        # print(resultado)
-        #
+        if texto_prueba is None:
+            print(f"Error al leer el archivo {ruta}. Asegúrate de que existe y es accesible.")
+            sys.exit(1)
+
+        lexical_automata = generar_afd_unificado(tokens)
+        _serialize_automata(lexical_automata, "lexical_out")
+
+        print("\nContenido de Test.txt: \n")
+        print(texto_prueba)
+
+        print("\n--- SIMULANDO texto ---")
+        resultado = simular_texto(texto_prueba, lexical_automata)
+        for i in resultado:
+            print(i)
+
 
 
 

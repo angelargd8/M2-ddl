@@ -107,7 +107,7 @@ def construirArbolSintactico(tokens: Union[str, List[str]]) -> Node:
             node = Node(token)
             node.firstpos.add(node.id)
             node.lastpos.add(node.id)
-            node.nullable = token in ['ε', 'e']
+            node.nullable = token in ['ε']
             return node, index - 1
         
         #es un operador unario puede tener un hijo 

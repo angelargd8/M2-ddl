@@ -155,8 +155,7 @@ def simular_texto(texto: str, automata: LexicalAutomata) -> List[List[str]]:
 
         if ultimo_estado_final is not None:
             lexema = texto[i:ultima_pos_final]
-            if token_encontrado != "WHITESPACE":
-                resultados.append([lexema, token_encontrado])
+            resultados.append([lexema, token_encontrado])
             i = ultima_pos_final
         else:
             resultados.append([texto[i], "ERROR"])
@@ -173,20 +172,30 @@ if texto_prueba is None:
     print(f"Error al leer el archivo {ruta}. Asegúrate de que existe y es accesible.")
     sys.exit(1)
 
+# tokens = {
+#     "NUMBER": "(((0|1|2|3|4|5|6|7|8|9)+)(\.((0|1|2|3|4|5|6|7|8|9)+))?(E(\+|-)?((0|1|2|3|4|5|6|7|8|9)+)))?",
+#     "WORD": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)+",
+#     "WHITESPACE": "( |\t|\n)+",
+#     "COND" : "if|else|while|for|return",
+#     "ID": "((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*)",
+#     "EQUAL": "=",
+#     "PLUS": "\\+",
+#     "MINUS": "-",
+#     "LPAREN": "\\(",
+#     "RPAREN": "\\)",
+#     "LBRACE": "\\{",
+#     "RBRACE": "\\}",
+#     "MULT": "\\*",
+# }
 tokens = {
-    "NUMBER": "(((0|1|2|3|4|5|6|7|8|9)+)(\.((0|1|2|3|4|5|6|7|8|9)+))?(E(\+|-)?((0|1|2|3|4|5|6|7|8|9)+)))?",
-    "WORD": "(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)+",
-    "WHITESPACE": "( |\t|\n)+",
+    "WS": "( |\t|\n)+",
     "COND" : "if|else|while|for|return",
-    "ID": "((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*)",
-    "EQUAL": "=",
+    "NUMBER": "(((0|1|2|3|4|5|6|7|8|9))+)((\.)((((0|1|2|3|4|5|6|7|8|9))+)))?(E((\+)|-)?((((0|1|2|3|4|5|6|7|8|9))+)))?",
+    "ID": "((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)(((A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)|(0|1|2|3|4|5|6|7|8|9))*))",
     "PLUS": "\\+",
-    "MINUS": "-",
+    "TIMES": "\\*",
     "LPAREN": "\\(",
-    "RPAREN": "\\)",
-    "LBRACE": "\\{",
-    "RBRACE": "\\}",
-    "MULT": "\\*",
+    "RPAREN": "\\)"
 }
 
 lexical_automata = generar_afd_unificado(tokens)
@@ -197,4 +206,5 @@ print(texto_prueba)
 
 print("\n--- SIMULANDO texto ---")
 resultado = simular_texto(texto_prueba, lexical_automata)
-print(resultado)
+for i in resultado:
+    print(i)

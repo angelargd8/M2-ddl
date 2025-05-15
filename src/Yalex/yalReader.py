@@ -119,7 +119,7 @@ class yalReader:
 
                         if expresion[i] == "'": # si empieza con comillas simples cada caracter está en comillas simples y se debe de separar por ellas
                             if expresion[i+1] in self.simbols: # esto sirve para validar los simbolos que están dentro de comillas
-                                temps += "\\"+expresion[i + 1]
+                                temps += "(\\"+expresion[i + 1]+")"
                                 i += 4
                                 temps += "|"
                             else:
@@ -141,11 +141,11 @@ class yalReader:
                         if expresion[i] == "\"": # si la expresion empieza con " comillas dobles, significa que la separacion es diferente
                             i += 1
                             while expresion[i] != "\"":
-                                if expresion[i] in self.simbols:
-                                    temps += "\\"+expresion[i]
+                                if expresion[i] in self.simbols: # la expresion tiene que ir en escapado
+                                    temps += "(\\"+expresion[i]+")"
                                 else:
                                     if expresion[i] == "\\":
-                                        temps += expresion[i] + expresion[i+1]
+                                        temps += "("+expresion[i] + expresion[i+1]+")"
                                         # print("!!!!!!!!"+temps)
                                         i += 1
                                     else:
@@ -156,12 +156,12 @@ class yalReader:
 
                         if expresion[i] == "]": # termina la cadena dentro de []
                             cadena = False
-                            # new_exp += ")"
-                            if (i+1 < len(expresion) and (expresion[i+1] in self.simbols) ) :
-                                new_exp += "(" + temps + ")" + expresion[i+1]
+                            grouped = "(" + temps + ")"
+                            if i + 1 < len(expresion) and expresion[i + 1] in self.simbols:
+                                new_exp += grouped + expresion[i + 1]
                                 i += 1
                             else:
-                                new_exp += temps
+                                new_exp += grouped
                             i += 1
 
                 else: # significa que hace referencia a otra variable y hay que remplazarla
@@ -169,7 +169,7 @@ class yalReader:
                         if expresion[i] == "'":
                             i += 1 # me salto la primera '
                             if expresion[i] in self.simbols:
-                                new_exp += "\\"+expresion[i] # agrego \ y la letra
+                                new_exp += "(\\"+expresion[i]+")" # agrego \ y la letra
                                 # print("!!!!!!!!!!!!!!!!!!!!!!"+ new_exp)
                             else:
                                 new_exp +=  expresion[i]
@@ -182,16 +182,23 @@ class yalReader:
                         # se guarda en un temp para evaluar si existe en el diccionario
                         # si existen se remplaza por el valor que ya tenia
                         temp = ""
-                        while expresion[i] not in self.simbols and expresion[i] != '.':
+                        while i < len(expresion) and expresion[i] not in self.simbols and expresion[i] != '.':
                             temp += expresion[i]
                             i += 1
-                        new_exp += "(" + self.dicc[temp] + ")"
-                        if expresion[i] in self.simbols :
-                            new_exp += expresion[i]
-                        if i+2 == len(expresion) and expresion[i+1] == "?":
-                            new_exp = "(" + new_exp + ")?"
-                            i += 1
-                        i += 1
+                        reemplazo = "(" + self.dicc[temp] + ")"
+                        if i < len(expresion) and expresion[i] in self.simbols:
+                            # Si lo siguiente es un '?', entonces agrupa TODO lo anterior
+                            if i + 1 < len(expresion) and expresion[i + 1] == "?":
+                                new_exp += "(" + reemplazo + expresion[i] + ")?"  # todo el grupo opcional
+                                i += 2
+                            else:
+                                new_exp += reemplazo + expresion[i]
+                                i += 1
+                        else:
+                            new_exp += reemplazo
+                            if i < len(expresion) and expresion[i] == "?":
+                                new_exp = "(" + new_exp + ")?"
+                                i += 1
 
             print(new_exp)
             # new_exp = new_exp.replace(".", "\.")
